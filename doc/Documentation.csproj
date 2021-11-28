@@ -1,7 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2</TargetFrameworks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<Title>WebApplication1</Title>
+		<Description></Description>
+		<Company></Company>
+		<Product>WebApplication1</Product>
+		<Copyright>Copyright © 2016</Copyright>
+		<Version>1.0.0.0</Version>
+		<FileVersion>1.0.0.0</FileVersion>
+	</PropertyGroup>
 
 </Project>
