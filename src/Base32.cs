@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Ipfs
+﻿namespace Ipfs
 {
     /// <summary>
     ///   A codec for Base-32.
@@ -70,7 +65,7 @@ namespace Ipfs
         /// </remarks>
         public static byte[] Decode(string input)
         {
-            return SimpleBase.Base32.Rfc4648.Decode(input);
+            return SimpleBase.Base32.Rfc4648.Decode(input).ToArray();
         }
 
         /// <summary>

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Ipfs
 {
     /// <summary>
@@ -64,7 +59,7 @@ namespace Ipfs
         /// </returns>
         public static byte[] Decode(string s)
         {
-            return SimpleBase.Base58.Bitcoin.Decode(s);
+            return SimpleBase.Base58.Bitcoin.Decode(s).ToArray();
         }
 
         /// <summary>
