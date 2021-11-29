@@ -299,7 +299,8 @@ namespace Ipfs
             Console.WriteLine($"| base 32 | {mh.ToBase32()} |");
 
         }
-        class TestVector
+
+        private class TestVector
         {
             public string Algorithm { get; set; }
             public string Input { get; set; }
@@ -307,7 +308,7 @@ namespace Ipfs
             public bool Ignore { get; set; }
         }
 
-        TestVector[] TestVectors = new TestVector[]
+        private TestVector[] TestVectors = new TestVector[]
         {
             // From https://github.com/multiformats/js-multihashing-async/blob/master/test/fixtures/encodes.js
             new TestVector {

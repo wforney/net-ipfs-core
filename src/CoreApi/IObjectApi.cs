@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///   Manages the IPFS Directed Acrylic Graph.
@@ -49,7 +42,7 @@ namespace Ipfs.CoreApi
         /// <remarks>
         ///  Caveat: So far, only UnixFS object layouts are supported.
         /// </remarks>
-        Task<DagNode> NewAsync(string template = null, CancellationToken cancel = default(CancellationToken));
+        Task<DagNode> NewAsync(string? template = null, CancellationToken cancel = default(CancellationToken));
 
         /// <summary>
         ///   Fetch a MerkleDAG node.
@@ -97,7 +90,7 @@ namespace Ipfs.CoreApi
         ///   A task that represents the asynchronous operation. The task's value
         ///   is a <see cref="DagNode"/>.
         /// </returns>
-        Task<DagNode> PutAsync(byte[] data, IEnumerable<IMerkleLink> links = null, CancellationToken cancel = default(CancellationToken));
+        Task<DagNode> PutAsync(byte[] data, IEnumerable<IMerkleLink>? links = null, CancellationToken cancel = default(CancellationToken));
 
         /// <summary>
         ///   Store a MerkleDAG node.

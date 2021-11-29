@@ -1,11 +1,6 @@
 ﻿// The SHA3 doesn't create .Net Standard package.
 // This is a copy of https://bitbucket.org/jdluzen/sha3/raw/d1fd55dc225d18a7fb61515b62d3c8f164d2e788/SHA3Managed/SHA3Managed.cs
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Ipfs.Cryptography
 {
     internal partial class KeccakManaged : Keccak
@@ -25,7 +20,7 @@ namespace Ipfs.Cryptography
             if (cbSize == 0)
                 return;
             int sizeInBytes = SizeInBytes;
-            if (buffer == null)
+            if (buffer is null || buffer.Length == 0)
                 buffer = new byte[sizeInBytes];
             int stride = sizeInBytes >> 3;
             ulong[] utemps = new ulong[stride];
@@ -59,7 +54,7 @@ namespace Ipfs.Cryptography
             int sizeInBytes = SizeInBytes;
             byte[] outb = new byte[HashByteLength];
             //    padding
-            if (buffer == null)
+            if (buffer is null || buffer.Length == 0)
                 buffer = new byte[sizeInBytes];
             else
                 Array.Clear(buffer, buffLength, sizeInBytes - buffLength);

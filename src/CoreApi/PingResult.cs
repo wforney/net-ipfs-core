@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
-    ///   The result from sending a <see cref="IGenericApi.PingAsync(MultiHash, int, System.Threading.CancellationToken)"/>.
+    /// The result from sending a <see cref="IGenericApi.PingAsync(MultiHash, int,
+    /// CancellationToken)" />.
     /// </summary>
     public class PingResult
     {
         /// <summary>
-        ///   Indicates success or failure.
+        /// Indicates success or failure.
         /// </summary>
         public bool Success { get; set; }
 
         /// <summary>
-        ///   The round trip time; nano second resolution.
+        /// The text to echo.
         /// </summary>
-        public TimeSpan Time { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
-        ///   The text to echo.
+        /// The round trip time; nano second resolution.
         /// </summary>
-        public string Text { get; set; }
+        public TimeSpan Time { get; set; }
     }
 }

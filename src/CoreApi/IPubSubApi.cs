@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///   Allows you to publish messages to a given topic, and also to
@@ -48,7 +41,7 @@ namespace Ipfs.CoreApi
         ///   A task that represents the asynchronous operation. The task's value is
         ///   a sequence of <see cref="Peer"/>.
         /// </returns>
-        Task<IEnumerable<Peer>> PeersAsync(string topic = null, CancellationToken cancel = default(CancellationToken));
+        Task<IEnumerable<Peer>> PeersAsync(string? topic = null, CancellationToken cancel = default(CancellationToken));
 
         /// <summary>
         ///   Publish a string message to a given topic.

@@ -1,15 +1,11 @@
 ﻿/*
  * The package was named SHA3 it is really Keccak
  * https://medium.com/@ConsenSys/are-you-really-using-sha-3-or-old-code-c5df31ad2b0
- * See 
- * 
+ * See
+ *
  * The SHA3 package doesn't create .Net Standard package.
  * This is a copy of https://bitbucket.org/jdluzen/sha3/raw/d1fd55dc225d18a7fb61515b62d3c8f164d2e788/SHA3/SHA3.cs
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Ipfs.Cryptography
 {
@@ -28,8 +24,8 @@ namespace Ipfs.Cryptography
 
         public readonly ulong[] RoundConstants;
 
-        protected ulong[] state;
-        protected byte[] buffer;
+        protected ulong[] state = Array.Empty<ulong>();
+        protected byte[] buffer = Array.Empty<byte>();
         protected int buffLength;
 #if PORTABLE || NETSTANDARD14
         protected byte[] HashValue;
@@ -80,7 +76,7 @@ namespace Ipfs.Cryptography
         protected Keccak(int hashBitLength)
         {
             if (hashBitLength != 224 && hashBitLength != 256 && hashBitLength != 384 && hashBitLength != 512)
-                throw new ArgumentException("hashBitLength must be 224, 256, 384, or 512", "hashBitLength");
+                throw new ArgumentException("hashBitLength must be 224, 256, 384, or 512", nameof(hashBitLength));
             Initialize();
             HashSizeValue = hashBitLength;
             switch (hashBitLength)
@@ -149,7 +145,7 @@ namespace Ipfs.Cryptography
         {
             get
             {
-                return HashValue;
+                return HashValue ?? Array.Empty<byte>();
             }
         }
 
@@ -185,11 +181,11 @@ namespace Ipfs.Cryptography
         void HashCore(byte[] array, int ibStart, int cbSize)
         {
             if (array == null)
-                throw new ArgumentNullException("array");
+                throw new ArgumentNullException(nameof(array));
             if (ibStart < 0)
-                throw new ArgumentOutOfRangeException("ibStart");
+                throw new ArgumentOutOfRangeException(nameof(ibStart));
             if (cbSize > array.Length)
-                throw new ArgumentOutOfRangeException("cbSize");
+                throw new ArgumentOutOfRangeException(nameof(cbSize));
             if (ibStart + cbSize > array.Length)
                 throw new ArgumentOutOfRangeException("ibStart or cbSize");
         }

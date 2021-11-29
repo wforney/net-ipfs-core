@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///   Some miscellaneous methods.
@@ -27,7 +20,7 @@ namespace Ipfs.CoreApi
         ///    A task that represents the asynchronous operation. The task's value is
         ///    the <see cref="Peer"/> information.
         /// </returns>
-        Task<Peer> IdAsync(MultiHash peer = null, CancellationToken cancel = default(CancellationToken));
+        Task<Peer> IdAsync(MultiHash? peer = null, CancellationToken cancel = default(CancellationToken));
 
         /// <summary>
         ///   Get the version information.

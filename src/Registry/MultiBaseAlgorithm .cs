@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Ipfs.Registry
+﻿namespace Ipfs.Registry
 {
     /// <summary>
     ///   Metadata and implemetations of an IPFS multi-base algorithm.
@@ -18,8 +15,8 @@ namespace Ipfs.Registry
     /// </remarks>
     public class MultiBaseAlgorithm
     {
-        internal static Dictionary<string, MultiBaseAlgorithm> Names = new Dictionary<string, MultiBaseAlgorithm>();
-        internal static Dictionary<char, MultiBaseAlgorithm> Codes = new Dictionary<char, MultiBaseAlgorithm>();
+        internal static Dictionary<string, MultiBaseAlgorithm> Names = new();
+        internal static Dictionary<char, MultiBaseAlgorithm> Codes = new();
 
         /// <summary>
         ///   Register the standard multi-base algorithms for IPFS.
@@ -90,7 +87,7 @@ namespace Ipfs.Registry
         /// <value>
         ///   A unique name.
         /// </value>
-        public string Name { get; private set; }
+        public string Name { get; private set; } = "base58btc";
 
         /// <summary>
         ///   The IPFS code assigned to the algorithm.
@@ -98,22 +95,22 @@ namespace Ipfs.Registry
         /// <value>
         ///   Valid codes at <see href="https://github.com/multiformats/multibase/blob/master/multibase.csv"/>.
         /// </value>
-        public char Code { get; private set; }
+        public char Code { get; private set; } = 'z';
 
         /// <summary>
         ///   Returns a function that can return a string from a byte array.
         /// </summary>
-        public Func<byte[], string> Encode { get; private set; }
+        public Func<byte[], string> Encode { get; private set; } = bytes => SimpleBase.Base58.Bitcoin.Encode(bytes);
 
         /// <summary>
         ///   Returns a function that can return a byte array from a string.
         /// </summary>
-        public Func<string, byte[]> Decode { get; private set; }
+        public Func<string, byte[]> Decode { get; private set; } = s => SimpleBase.Base58.Bitcoin.Decode(s).ToArray();
 
         /// <summary>
         ///   Use <see cref="Register"/> to create a new instance of a <see cref="MultiBaseAlgorithm"/>.
         /// </summary>
-        MultiBaseAlgorithm()
+        private MultiBaseAlgorithm()
         {
         }
 
@@ -147,22 +144,22 @@ namespace Ipfs.Registry
         /// </returns>
         public static MultiBaseAlgorithm Register(
             string name, char code,
-            Func<byte[], string> encode = null,
-            Func<string, byte[]> decode = null)
+            Func<byte[], string>? encode = null,
+            Func<string, byte[]>? decode = null)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             if (Names.ContainsKey(name))
                 throw new ArgumentException(string.Format("The IPFS multi-base algorithm name '{0}' is already defined.", name));
             if (Codes.ContainsKey(code))
                 throw new ArgumentException(string.Format("The IPFS multi-base algorithm code '{0}' is already defined.", code));
-            if (encode == null)
+            if (encode is null)
             {
-                encode = (bytes) => { throw new NotImplementedException(string.Format("The IPFS encode multi-base algorithm '{0}' is not implemented.", name)); };
+                encode = (bytes) => throw new NotImplementedException(string.Format("The IPFS encode multi-base algorithm '{0}' is not implemented.", name));
             }
-            if (decode == null)
+            if (decode is null)
             {
-                decode = (s) => { throw new NotImplementedException(string.Format("The IPFS decode multi-base algorithm '{0}' is not implemented.", name)); };
+                decode = (s) => throw new NotImplementedException(string.Format("The IPFS decode multi-base algorithm '{0}' is not implemented.", name));
             }
 
             var a = new MultiBaseAlgorithm

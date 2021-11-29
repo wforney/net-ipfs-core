@@ -1,12 +1,4 @@
-﻿using Ipfs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///    Find information about who has what content.
@@ -56,7 +48,7 @@ namespace Ipfs.CoreApi
         Task<IEnumerable<Peer>> FindProvidersAsync(
             Cid id,
             int limit = 20,
-            Action<Peer> providerFound = null,
+            Action<Peer>? providerFound = null,
             CancellationToken cancel = default(CancellationToken));
     }
 }

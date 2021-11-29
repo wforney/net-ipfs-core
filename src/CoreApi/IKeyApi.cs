@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///   Manages cryptographic keys.
@@ -124,6 +118,6 @@ namespace Ipfs.CoreApi
         ///    A task that represents the asynchronous operation. The task's result
         ///    is the newly imported key.
         /// </returns>
-        Task<IKey> ImportAsync(string name, string pem, char[] password = null, CancellationToken cancel = default(CancellationToken));
+        Task<IKey> ImportAsync(string name, string pem, char[]? password = null, CancellationToken cancel = default(CancellationToken));
     }
 }

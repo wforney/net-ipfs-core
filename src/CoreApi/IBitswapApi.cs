@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
-    ///   Data trading module for IPFS. Its purpose is to request blocks from and 
+    ///   Data trading module for IPFS. Its purpose is to request blocks from and
     ///   send blocks to other peers in the network.
     /// </summary>
     /// <remarks>
@@ -51,7 +45,7 @@ namespace Ipfs.CoreApi
         /// </summary>
         /// <param name="peer">
         ///   The id of an IPFS peer. If not specified (e.g. null), then the local
-        ///   peer is used.        
+        ///   peer is used.
         /// </param>
         /// <param name="cancel">
         ///   Is used to stop the task.  When cancelled, the <see cref="TaskCanceledException"/> is raised.
@@ -60,7 +54,7 @@ namespace Ipfs.CoreApi
         ///   A task that represents the asynchronous operation. The task's value
         ///   contains the sequence of blocks needed by the <paramref name="peer"/>.
         /// </returns>
-        Task<IEnumerable<Cid>> WantsAsync(MultiHash peer = null, CancellationToken cancel = default(CancellationToken));
+        Task<IEnumerable<Cid>> WantsAsync(MultiHash? peer = null, CancellationToken cancel = default(CancellationToken));
 
         /// <summary>
         ///   Remove the CID from the want list.

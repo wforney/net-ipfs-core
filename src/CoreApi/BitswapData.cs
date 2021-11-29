@@ -1,65 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
-    ///   The statistics for <see cref="IStatsApi.BitswapAsync"/>.
+    /// The statistics for <see cref="IStatsApi.BitswapAsync" />.
     /// </summary>
     public class BitswapData
     {
         /// <summary>
-        ///   TODO: Unknown.
+        /// The number of blocks sent by other peers.
         /// </summary>
-        public int ProvideBufLen;
+        public ulong BlocksReceived { get; set; }
 
         /// <summary>
-        ///   The content that is wanted.
+        /// The number of blocks sent to other peers.
         /// </summary>
-        public IEnumerable<Cid> Wantlist;
+        public ulong BlocksSent { get; set; }
 
         /// <summary>
-        ///   The known peers.
+        /// The number of bytes sent by other peers.
         /// </summary>
-        public IEnumerable<MultiHash> Peers;
+        public ulong DataReceived { get; set; }
 
         /// <summary>
-        ///   The number of blocks sent by other peers.
+        /// The number of bytes sent to other peers.
         /// </summary>
-        public ulong BlocksReceived;
+        public ulong DataSent { get; set; }
 
         /// <summary>
-        ///   The number of bytes sent by other peers.
+        /// The number of duplicate blocks sent by other peers.
         /// </summary>
-        public ulong DataReceived;
+        /// <remarks>A duplicate block is a block that is already stored in the local repository.</remarks>
+        public ulong DupBlksReceived { get; set; }
 
         /// <summary>
-        ///   The number of blocks sent to other peers.
+        /// The number of duplicate bytes sent by other peers.
         /// </summary>
-        public ulong BlocksSent;
+        /// <remarks>A duplicate block is a block that is already stored in the local repository.</remarks>
+        public ulong DupDataReceived { get; set; }
 
         /// <summary>
-        ///   The number of bytes sent to other peers.
+        /// The known peers.
         /// </summary>
-        public ulong DataSent;
+        public IEnumerable<MultiHash>? Peers { get; set; }
 
         /// <summary>
-        ///   The number of duplicate blocks sent by other peers.
+        /// TODO: Unknown.
         /// </summary>
-        /// <remarks>
-        ///   A duplicate block is a block that is already stored in the
-        ///   local repository.
-        /// </remarks>
-        public ulong DupBlksReceived;
+        public int ProvideBufLen { get; set; }
 
         /// <summary>
-        ///   The number of duplicate bytes sent by other peers.
+        /// The content that is wanted.
         /// </summary>
-        /// <remarks>
-        ///   A duplicate block is a block that is already stored in the
-        ///   local repository.
-        /// </remarks>
-        public ulong DupDataReceived;
+        public IEnumerable<Cid>? Wantlist { get; set; }
     }
 }

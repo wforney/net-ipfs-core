@@ -1,10 +1,4 @@
 ﻿using Google.Protobuf;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ipfs
 {
@@ -51,6 +45,9 @@ namespace Ipfs
         /// </param>
         public DagLink(Stream stream)
         {
+            this.Id = new Cid();
+            this.Name = string.Empty;
+            this.Size = default;
             Read(stream);
         }
 
@@ -64,6 +61,9 @@ namespace Ipfs
         /// </param>
         public DagLink(CodedInputStream stream)
         {
+            this.Id = new Cid();
+            this.Name = string.Empty;
+            this.Size = default;
             Read(stream);
         }
 
@@ -84,10 +84,8 @@ namespace Ipfs
         /// </param>
         public void Write(Stream stream)
         {
-            using (var cos = new CodedOutputStream(stream, true))
-            {
-                Write(cos);
-            }
+            using var cos = new CodedOutputStream(stream, true);
+            Write(cos);
         }
 
         /// <summary>
@@ -98,13 +96,15 @@ namespace Ipfs
         /// </param>
         public void Write(CodedOutputStream stream)
         {
-            if (stream == null)
-                throw new ArgumentNullException("stream");
+            if (stream is null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
 
             stream.WriteTag(1, WireFormat.WireType.LengthDelimited);
-            Id.Write(stream);
+            Id?.Write(stream);
 
-            if (Name != null)
+            if (Name is not null)
             {
                 stream.WriteTag(2, WireFormat.WireType.LengthDelimited);
                 stream.WriteString(Name);
@@ -114,15 +114,13 @@ namespace Ipfs
             stream.WriteInt64(Size);
         }
 
-        void Read(Stream stream)
+        private void Read(Stream stream)
         {
-            using (var cis = new CodedInputStream(stream, true))
-            {
-                Read(cis);
-            }
+            using var cis = new CodedInputStream(stream, true);
+            Read(cis);
         }
 
-        void Read(CodedInputStream stream)
+        private void Read(CodedInputStream stream)
         {
             while (!stream.IsAtEnd)
             {
@@ -152,11 +150,9 @@ namespace Ipfs
         /// </returns>
         public byte[] ToArray()
         {
-            using (var ms = new MemoryStream())
-            {
-                Write(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            Write(ms);
+            return ms.ToArray();
         }
 
     }

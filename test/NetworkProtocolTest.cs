@@ -30,7 +30,7 @@ namespace Ipfs
             ExceptionAssert.Throws<ArgumentException>(() => NetworkProtocol.Register<CodeExists>());
         }
 
-        class NameExists : NetworkProtocol
+        private class NameExists : NetworkProtocol
         {
             public override string Name { get { return "tcp"; } }
             public override uint Code { get { return 0x7FFF; } }
@@ -39,7 +39,7 @@ namespace Ipfs
             public override void WriteValue(CodedOutputStream stream) { }
         }
 
-        class CodeExists : NetworkProtocol
+        private class CodeExists : NetworkProtocol
         {
             public override string Name { get { return "x-tcp"; } }
             public override uint Code { get { return 6; } }

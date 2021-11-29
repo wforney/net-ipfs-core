@@ -1,9 +1,5 @@
 ﻿using Google.Protobuf;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace Ipfs
@@ -17,7 +13,7 @@ namespace Ipfs
     ///   </para>
     ///   <para>
     ///   Initially, IPFS used a <see cref="MultiHash"/> as the CID and this is still supported as <see cref="Version"/> 0.
-    ///   Version 1 adds a self describing structure to the multi-hash, see the <see href="https://github.com/ipld/cid">spec</see>. 
+    ///   Version 1 adds a self describing structure to the multi-hash, see the <see href="https://github.com/ipld/cid">spec</see>.
     ///   </para>
     ///   <note>
     ///   The <see cref="MultiHash.Algorithm">hashing algorithm</see> must be "sha2-256" for a version 0 CID.
@@ -25,19 +21,18 @@ namespace Ipfs
     /// </remarks>
     /// <seealso href="https://github.com/ipld/cid"/>
     [JsonConverter(typeof(Cid.CidJsonConverter))]
-    public class Cid : IEquatable<Cid>
+    public partial class Cid : IEquatable<Cid>
     {
         /// <summary>
         ///   The default <see cref="ContentType"/>.
         /// </summary>
         public const string DefaultContentType = "dag-pb";
+        private string? encodedValue;
+        private int version;
+        private string encoding = MultiBase.DefaultAlgorithmName;
+        private string contentType = DefaultContentType;
+        private MultiHash? hash;
 
-        string encodedValue;
-        int version;
-        string encoding = MultiBase.DefaultAlgorithmName;
-        string contentType = DefaultContentType;
-        MultiHash hash;
- 
         /// <summary>
         ///   Throws if a property cannot be set.
         /// </summary>
@@ -48,9 +43,9 @@ namespace Ipfs
         ///   Once <see cref="Encode"/> is invoked, the CID's properties
         ///   cannot be set.
         /// </remarks>
-        void EnsureMutable()
+        private void EnsureMutable()
         {
-            if (encodedValue != null)
+            if (encodedValue is not null)
             {
                 throw new NotSupportedException("CID cannot be changed.");
             }
@@ -65,7 +60,7 @@ namespace Ipfs
         /// <remarks>
         ///   <para>
         ///   When the <see cref="Version"/> is 0 and the following properties
-        ///   are not matched, then the version is upgraded to version 1 when any 
+        ///   are not matched, then the version is upgraded to version 1 when any
         ///   of the properties is set.
         ///   <list type="bullet">
         ///   <item><description><see cref="ContentType"/> equals "dag-pb"</description></item>
@@ -170,13 +165,13 @@ namespace Ipfs
         {
             get
             {
-                return hash;
+                return hash ?? new MultiHash(Array.Empty<byte>());
             }
             set
             {
                 EnsureMutable();
                 hash = value;
-                if (Version == 0 && Hash.Algorithm.Name != "sha2-256")
+                if (Version == 0 && Hash.Algorithm?.Name != "sha2-256")
                 {
                     Version = 1;
                 }
@@ -213,20 +208,20 @@ namespace Ipfs
         /// <para>
         ///   The "G" format specifier is the same as calling <see cref="Encode"/>.
         /// </para>
-        /// <list type="table">  
-        /// <listheader>  
-        ///   <term>Specifier</term>  
-        ///   <description>return value</description>  
-        /// </listheader>  
-        ///  <item>  
-        ///    <term>G</term>  
-        ///    <description>QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V</description>  
-        ///  </item>  
-        ///  <item>  
-        ///    <term>L</term>  
-        ///    <description>base58btc cidv0 dag-pb sha2-256 Qm...</description>  
-        ///  </item>  
-        /// </list> 
+        /// <list type="table">
+        /// <listheader>
+        ///   <term>Specifier</term>
+        ///   <description>return value</description>
+        /// </listheader>
+        ///  <item>
+        ///    <term>G</term>
+        ///    <description>QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V</description>
+        ///  </item>
+        ///  <item>
+        ///    <term>L</term>
+        ///    <description>base58btc cidv0 dag-pb sha2-256 Qm...</description>
+        ///  </item>
+        /// </list>
         /// </remarks>
         public string ToString(string format)
         {
@@ -243,19 +238,19 @@ namespace Ipfs
                     sb.Append(Version);
                     sb.Append(' ');
                     sb.Append(ContentType);
-                    if (Hash != null)
+                    if (Hash is not null)
                     {
                         sb.Append(' ');
-                        sb.Append(Hash.Algorithm.Name);
+                        sb.Append(Hash.Algorithm?.Name);
                         sb.Append(' ');
-                        sb.Append(MultiBase.Encode(Hash.ToArray(), Encoding).Substring(1));
+                        sb.Append(MultiBase.Encode(Hash.ToArray(), Encoding).AsSpan(1));
                     }
                     return sb.ToString();
 
                 default:
                     throw new FormatException($"Invalid CID format specifier '{format}'.");
             }
-        
+
         }
 
         /// <summary>
@@ -265,14 +260,14 @@ namespace Ipfs
         ///   The string representation of the <see cref="Cid"/>.
         /// </returns>
         /// <remarks>
-        ///   For <see cref="Version"/> 0, this is equalivalent to the 
+        ///   For <see cref="Version"/> 0, this is equalivalent to the
         ///   <see cref="MultiHash.ToBase58()">base58btc encoding</see>
         ///   of the <see cref="Hash"/>.
         /// </remarks>
         /// <seealso cref="Decode"/>
         public string Encode()
         {
-            if (encodedValue != null)
+            if (encodedValue is not null)
             {
                 return encodedValue;
             }
@@ -282,13 +277,11 @@ namespace Ipfs
             }
             else
             {
-                using (var ms = new MemoryStream())
-                {
-                    ms.WriteVarint(Version);
-                    ms.WriteMultiCodec(ContentType);
-                    Hash.Write(ms);
-                    encodedValue = MultiBase.Encode(ms.ToArray(), Encoding);
-                }
+                using var ms = new MemoryStream();
+                ms.WriteVarint(Version);
+                ms.WriteMultiCodec(ContentType);
+                Hash.Write(ms);
+                encodedValue = MultiBase.Encode(ms.ToArray(), Encoding);
             }
             return encodedValue;
         }
@@ -317,21 +310,17 @@ namespace Ipfs
                     return (Cid)new MultiHash(input);
                 }
 
-                using (var ms = new MemoryStream(MultiBase.Decode(input), false))
-                {
-                    var v = ms.ReadVarint32();
-                    if (v != 1)
-                    {
-                        throw new InvalidDataException($"Unknown CID version '{v}'.");
-                    }
-                    return new Cid
+                using var ms = new MemoryStream(MultiBase.Decode(input), false);
+                var v = ms.ReadVarint32();
+                return v != 1
+                    ? throw new InvalidDataException($"Unknown CID version '{v}'.")
+                    : new Cid
                     {
                         Version = v,
                         Encoding = Registry.MultiBaseAlgorithm.Codes[input[0]].Name,
                         ContentType = ms.ReadMultiCodec().Name,
                         Hash = new MultiHash(ms)
                     };
-                }
             }
             catch (Exception e)
             {
@@ -374,19 +363,17 @@ namespace Ipfs
         /// </param>
         public void Write(Stream stream)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            if (Version != 0)
             {
-                if (Version != 0)
-                {
-                    ms.WriteVarint(Version);
-                    ms.WriteMultiCodec(this.ContentType);
-                }
-                Hash.Write(ms);
-
-                stream.WriteVarint(ms.Length);
-                ms.Position = 0;
-                ms.CopyTo(stream);
+                ms.WriteVarint(Version);
+                ms.WriteMultiCodec(this.ContentType);
             }
+            Hash.Write(ms);
+
+            stream.WriteVarint(ms.Length);
+            ms.Position = 0;
+            ms.CopyTo(stream);
         }
 
         /// <summary>
@@ -424,19 +411,17 @@ namespace Ipfs
         /// </param>
         public void Write(CodedOutputStream stream)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            if (Version != 0)
             {
-                if (Version != 0)
-                {
-                    ms.WriteVarint(Version);
-                    ms.WriteMultiCodec(this.ContentType);
-                }
-                Hash.Write(ms);
-
-                var bytes = ms.ToArray();
-                stream.WriteLength(bytes.Length);
-                stream.WriteSomeBytes(bytes);
+                ms.WriteVarint(Version);
+                ms.WriteMultiCodec(this.ContentType);
             }
+            Hash.Write(ms);
+
+            var bytes = ms.ToArray();
+            stream.WriteLength(bytes.Length);
+            stream.WriteSomeBytes(bytes);
         }
 
         /// <summary>
@@ -461,13 +446,11 @@ namespace Ipfs
                 return cid;
             }
 
-            using (var ms = new MemoryStream(buffer, false))
-            {
-                cid.Version = ms.ReadVarint32();
-                cid.ContentType = ms.ReadMultiCodec().Name;
-                cid.Hash = new MultiHash(ms);
-                return cid;
-            }
+            using var ms = new MemoryStream(buffer, false);
+            cid.Version = ms.ReadVarint32();
+            cid.ContentType = ms.ReadMultiCodec().Name;
+            cid.Hash = new MultiHash(ms);
+            return cid;
         }
 
         /// <summary>
@@ -486,13 +469,11 @@ namespace Ipfs
                 return Hash.ToArray();
             }
 
-            using (var ms = new MemoryStream())
-            {
-                ms.WriteVarint(Version);
-                ms.WriteMultiCodec(this.ContentType);
-                Hash.Write(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            ms.WriteVarint(Version);
+            ms.WriteMultiCodec(this.ContentType);
+            Hash.Write(ms);
+            return ms.ToArray();
         }
 
         /// <summary>
@@ -507,22 +488,19 @@ namespace Ipfs
         /// </returns>
         static public implicit operator Cid(MultiHash hash)
         {
-            if (hash.Algorithm.Name == "sha2-256")
-            {
-                return new Cid
+            return hash.Algorithm?.Name == "sha2-256"
+                ? new Cid
                 {
                     Hash = hash,
                     Version = 0,
                     Encoding = "base58btc",
                     ContentType = "dag-pb"
+                }
+                : new Cid
+                {
+                    Version = 1,
+                    Hash = hash
                 };
-            }
-
-            return new Cid
-            {
-                Version = 1,
-                Hash = hash
-            };
         }
         /// <inheritdoc />
         public override int GetHashCode()
@@ -531,18 +509,15 @@ namespace Ipfs
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var that = obj as Cid;
-            return (that == null)
-                ? false
-                : this.Encode() == that.Encode();
+            return obj is Cid that && this.Encode() == that.Encode();
         }
 
         /// <inheritdoc />
-        public bool Equals(Cid that)
+        public bool Equals(Cid? that)
         {
-            return this.Encode() == that.Encode();
+            return this.Encode() == that?.Encode();
         }
 
         /// <summary>
@@ -550,19 +525,7 @@ namespace Ipfs
         /// </summary>
         public static bool operator ==(Cid a, Cid b)
         {
-            if (object.ReferenceEquals(a, b))
-            {
-                return true;
-            }
-            if (object.ReferenceEquals(a, null))
-            {
-                return false;
-            }
-            if (object.ReferenceEquals(b, null))
-            {
-                return false;
-            }
-            return a.Equals(b);
+            return ReferenceEquals(a, b) || a is not null && b is not null && a.Equals(b);
         }
 
         /// <summary>
@@ -570,19 +533,7 @@ namespace Ipfs
         /// </summary>
         public static bool operator !=(Cid a, Cid b)
         {
-            if (object.ReferenceEquals(a, b))
-            {
-                return false;
-            }
-            if (object.ReferenceEquals(a, null))
-            {
-                return true;
-            }
-            if (object.ReferenceEquals(b, null))
-            {
-                return true;
-            }
-            return !a.Equals(b);
+            return !ReferenceEquals(a, b) && (a is null || (b is null || !a.Equals(b)));
         }
 
         /// <summary>
@@ -599,7 +550,7 @@ namespace Ipfs
         /// </remarks>
         static public implicit operator Cid(string s)
         {
-            return Cid.Decode(s);
+            return Decode(s);
         }
 
         /// <summary>
@@ -618,41 +569,5 @@ namespace Ipfs
         {
             return id.Encode();
         }
-
-        /// <summary>
-        ///   Conversion of a <see cref="Cid"/> to and from JSON.
-        /// </summary>
-        /// <remarks>
-        ///   The JSON is just a single string value.
-        /// </remarks>
-        public class CidJsonConverter : JsonConverter
-        {
-            /// <inheritdoc />
-            public override bool CanConvert(Type objectType)
-            {
-                return true;
-            }
-
-            /// <inheritdoc />
-            public override bool CanRead => true;
-
-            /// <inheritdoc />
-            public override bool CanWrite => true;
-
-            /// <inheritdoc />
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            {
-                var cid = value as Cid;
-                writer.WriteValue(cid?.Encode());
-            }
-
-            /// <inheritdoc />
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            {
-                var s = reader.Value as string;
-                return s == null ? null : Cid.Decode(s);
-            }
-        }
-
     }
 }

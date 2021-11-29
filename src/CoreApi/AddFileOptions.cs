@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///   The options when adding data to the IPFS file system.
@@ -92,11 +88,11 @@ namespace Ipfs.CoreApi
         ///   <b>ProtectionKey</b> and <see cref="RawLeaves"/> are mutually exclusive.
         /// </remarks>
         /// <seealso cref="IKeyApi"/>
-        public string ProtectionKey { get; set; }
+        public string? ProtectionKey { get; set; }
 
         /// <summary>
         ///   Used to report the progress of a file transfer.
         /// </summary>
-        public IProgress<TransferProgress> Progress { get; set; }
+        public IProgress<TransferProgress>? Progress { get; set; }
     }
 }

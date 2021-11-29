@@ -9,16 +9,16 @@ namespace Ipfs.Cryptography
     [TestClass]
     public class HashingTest
     {
-        static readonly string Merkle = Encoding.UTF8.GetBytes("Merkle–Damgård").ToHexString();
+        private static readonly string Merkle = Encoding.UTF8.GetBytes("Merkle–Damgård").ToHexString();
 
-        class TestVector
+        private class TestVector
         {
             public string Algorithm { get; set; }
             public string Input { get; set; }
             public string Digest { get; set; }
         }
 
-        TestVector[] TestVectors = new TestVector[]
+        private TestVector[] TestVectors = new TestVector[]
         {
             new TestVector
             {

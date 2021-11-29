@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ipfs.Registry
+﻿namespace Ipfs.Registry
 {
     /// <summary>
-    ///   Metadata for IPFS multi-codec.
+    /// Metadata for IPFS multi-codec.
     /// </summary>
     /// <remarks>
-    ///   IPFS assigns a unique <see cref="Name"/> and <see cref="Code"/> to codecs.
-    ///   See <see href="https://github.com/multiformats/multicodec/blob/master/table.csv">table.csv</see> 
-    ///   for the currently defined multi-codecs.
+    /// IPFS assigns a unique <see cref="Name" /> and <see cref="Code" /> to codecs. See <see
+    /// href="https://github.com/multiformats/multicodec/blob/master/table.csv">table.csv</see> for
+    /// the currently defined multi-codecs.
     /// </remarks>
-    /// <seealso href="https://github.com/multiformats/multicodec"/>
+    /// <seealso href="https://github.com/multiformats/multicodec" />
     public class Codec
     {
-        internal static Dictionary<string, Codec> Names = new Dictionary<string, Codec>();
-        internal static Dictionary<int, Codec> Codes = new Dictionary<int, Codec>();
+        internal static Dictionary<int, Codec> Codes = new();
+        internal static Dictionary<string, Codec> Names = new();
 
         /// <summary>
-        ///   Register the standard multi-codecs for IPFS.
+        /// Register the standard multi-codecs for IPFS.
         /// </summary>
-        /// <seealso href="https://github.com/multiformats/multicodec/blob/master/table.csv"/>
+        /// <seealso href="https://github.com/multiformats/multicodec/blob/master/table.csv" />
         static Codec()
         {
             Register("raw", 0x55);
@@ -58,61 +54,62 @@ namespace Ipfs.Registry
         }
 
         /// <summary>
-        ///   The name of the codec.
+        /// Use <see cref="Register" /> to create a new instance of a <see cref="Codec" />.
         /// </summary>
-        /// <value>
-        ///   A unique name.
-        /// </value>
-        public string Name { get; private set; }
-
-        /// <summary>
-        ///   The IPFS code assigned to the codec.
-        /// </summary>
-        /// <value>
-        ///   Valid codes at <see href="https://github.com/multiformats/multicodec/blob/master/table.csv"/>.
-        /// </value>
-        public int Code { get; private set; }
-
-        /// <summary>
-        ///   Use <see cref="Register"/> to create a new instance of a <see cref="Codec"/>.
-        /// </summary>
-        Codec()
+        private Codec()
         {
         }
 
         /// <summary>
-        ///   The <see cref="Name"/> of the codec.
+        /// A sequence consisting of all codecs.
         /// </summary>
-        /// <value>
-        ///   The <see cref="Name"/> of the codec.
-        /// </value>
-        public override string ToString()
+        /// <value>All the registered codecs.</value>
+        public static IEnumerable<Codec> All
         {
-            return Name;
+            get { return Names.Values; }
         }
 
         /// <summary>
-        ///   Register a new IPFS codec.
+        /// The IPFS code assigned to the codec.
         /// </summary>
-        /// <param name="name">
-        ///   The name of the codec.
-        /// </param>
-        /// <param name="code">
-        ///   The IPFS code assigned to the codec.
-        /// </param>
-        /// <returns>
-        ///   A new <see cref="Codec"/>.
-        /// </returns>
+        /// <value>
+        /// Valid codes at <see
+        /// href="https://github.com/multiformats/multicodec/blob/master/table.csv" />.
+        /// </value>
+        public int Code { get; private set; } = 0x55;
+
+        /// <summary>
+        /// The name of the codec.
+        /// </summary>
+        /// <value>A unique name.</value>
+        public string Name { get; private set; } = "raw";
+
+        /// <summary>
+        /// Remove an IPFS codec from the registry.
+        /// </summary>
+        /// <param name="codec">The <see cref="Codec" /> to remove.</param>
+        public static void Deregister(Codec codec)
+        {
+            Names.Remove(codec.Name);
+            Codes.Remove(codec.Code);
+        }
+
+        /// <summary>
+        /// Register a new IPFS codec.
+        /// </summary>
+        /// <param name="name">The name of the codec.</param>
+        /// <param name="code">The IPFS code assigned to the codec.</param>
+        /// <returns>A new <see cref="Codec" />.</returns>
         /// <exception cref="ArgumentException">
-        ///   When the <paramref name="name"/> or <paramref name="code"/> is already defined.
+        /// When the <paramref name="name" /> or <paramref name="code" /> is already defined.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        ///   When the <paramref name="name"/> is null or empty.
+        /// When the <paramref name="name" /> is null or empty.
         /// </exception>
         public static Codec Register(string name, int code)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             if (Names.ContainsKey(name))
                 throw new ArgumentException(string.Format("The IPFS codec name '{0}' is already defined.", name));
             if (Codes.ContainsKey(code))
@@ -128,28 +125,14 @@ namespace Ipfs.Registry
 
             return a;
         }
-        /// <summary>
-        ///   Remove an IPFS codec from the registry.
-        /// </summary>
-        /// <param name="codec">
-        ///   The <see cref="Codec"/> to remove.
-        /// </param>
-        public static void Deregister(Codec codec)
-        {
-            Names.Remove(codec.Name);
-            Codes.Remove(codec.Code);
-        }
 
         /// <summary>
-        ///   A sequence consisting of all codecs.
+        /// The <see cref="Name" /> of the codec.
         /// </summary>
-        /// <value>
-        ///   All the registered codecs.
-        /// </value>
-        public static IEnumerable<Codec> All
+        /// <value>The <see cref="Name" /> of the codec.</value>
+        public override string ToString()
         {
-            get { return Names.Values; }
+            return Name;
         }
-
     }
 }

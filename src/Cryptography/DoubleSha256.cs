@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System.Security.Cryptography;
 
 namespace Ipfs.Cryptography
 {
-    class DoubleSha256 : HashAlgorithm
+    internal class DoubleSha256 : HashAlgorithm
     {
-        HashAlgorithm digest = SHA256.Create();
-        byte[] round1;
+        private HashAlgorithm digest = SHA256.Create();
+        private byte[]? round1;
 
         public override void Initialize()
         {
@@ -29,7 +26,7 @@ namespace Ipfs.Cryptography
         protected override byte[] HashFinal()
         {
             digest.Initialize();
-            return digest.ComputeHash(round1);
+            return digest.ComputeHash(round1 ?? Array.Empty<byte>());
         }
 
     }
