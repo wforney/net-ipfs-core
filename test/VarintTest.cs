@@ -1,11 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ipfs
 {
@@ -20,7 +13,7 @@ namespace Ipfs
             CollectionAssert.AreEqual(x, Varint.Encode(0));
             Assert.AreEqual(0, Varint.DecodeInt32(x));
         }
-        
+
         [TestMethod]
         public void ThreeHundred()
         {
@@ -49,53 +42,51 @@ namespace Ipfs
         [TestMethod]
         public void Encode_Negative()
         {
-            ExceptionAssert.Throws<NotSupportedException>(() => Varint.Encode(-1));
+            Assert.ThrowsException<NotSupportedException>(() => Varint.Encode(-1));
         }
 
         [TestMethod]
         public void TooBig_Int32()
         {
-            var bytes = Varint.Encode((long)Int32.MaxValue + 1);
-            ExceptionAssert.Throws<InvalidDataException>(() => Varint.DecodeInt32(bytes));
+            var bytes = Varint.Encode((long)int.MaxValue + 1);
+            Assert.ThrowsException<InvalidDataException>(() => Varint.DecodeInt32(bytes));
         }
 
         [TestMethod]
         public void TooBig_Int64()
         {
             var bytes = "ffffffffffffffffff7f".ToHexBuffer();
-            ExceptionAssert.Throws<InvalidDataException>(() => Varint.DecodeInt64(bytes));
+            Assert.ThrowsException<InvalidDataException>(() => Varint.DecodeInt64(bytes));
         }
 
         [TestMethod]
         public void Unterminated()
         {
             var bytes = "ff".ToHexBuffer();
-            ExceptionAssert.Throws<InvalidDataException>(() => Varint.DecodeInt64(bytes));
+            Assert.ThrowsException<InvalidDataException>(() => Varint.DecodeInt64(bytes));
         }
 
         [TestMethod]
         public void Empty()
         {
-            var bytes = new byte[0];
-            ExceptionAssert.Throws<EndOfStreamException>(() => Varint.DecodeInt64(bytes));
+            var bytes = Array.Empty<byte>();
+            Assert.ThrowsException<EndOfStreamException>(() => Varint.DecodeInt64(bytes));
         }
 
         [TestMethod]
         public async Task WriteAsync()
         {
-            using (var ms = new MemoryStream())
-            {
-                await ms.WriteVarintAsync(long.MaxValue);
-                ms.Position = 0;
-                Assert.AreEqual(long.MaxValue, ms.ReadVarint64());
-            }
+            using var ms = new MemoryStream();
+            await ms.WriteVarintAsync(long.MaxValue);
+            ms.Position = 0;
+            Assert.AreEqual(long.MaxValue, ms.ReadVarint64());
         }
 
         [TestMethod]
         public void WriteAsync_Negative()
         {
             var ms = new MemoryStream();
-            ExceptionAssert.Throws<Exception>(() => ms.WriteVarintAsync(-1).Wait());
+            Assert.ThrowsExceptionAsync<Exception>(() => ms.WriteVarintAsync(-1));
         }
 
         [TestMethod]
@@ -104,17 +95,15 @@ namespace Ipfs
             var ms = new MemoryStream();
             var cs = new CancellationTokenSource();
             cs.Cancel();
-            ExceptionAssert.Throws<TaskCanceledException>(() => ms.WriteVarintAsync(0, cs.Token).Wait());
+            Assert.ThrowsExceptionAsync<TaskCanceledException>(() => ms.WriteVarintAsync(0, cs.Token));
         }
 
         [TestMethod]
         public async Task ReadAsync()
         {
-            using (var ms = new MemoryStream("ffffffffffffffff7f".ToHexBuffer()))
-            {
-                var v = await ms.ReadVarint64Async();
-                Assert.AreEqual(long.MaxValue, v);
-            }
+            using var ms = new MemoryStream("ffffffffffffffff7f".ToHexBuffer());
+            var v = await ms.ReadVarint64Async();
+            Assert.AreEqual(long.MaxValue, v);
         }
 
         [TestMethod]
@@ -123,7 +112,7 @@ namespace Ipfs
             var ms = new MemoryStream(new byte[] { 0 });
             var cs = new CancellationTokenSource();
             cs.Cancel();
-            ExceptionAssert.Throws<TaskCanceledException>(() => ms.ReadVarint32Async(cs.Token).Wait());
+            Assert.ThrowsExceptionAsync<TaskCanceledException>(() => ms.ReadVarint32Async(cs.Token));
         }
 
         [TestMethod]

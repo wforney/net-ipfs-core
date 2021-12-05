@@ -1,9 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ipfs
 {
@@ -13,7 +8,7 @@ namespace Ipfs
         [TestMethod]
         public void Encode()
         {
-            var buffer = Enumerable.Range(byte.MinValue, byte.MaxValue).Select(b => (byte) b).ToArray();
+            var buffer = Enumerable.Range(byte.MinValue, byte.MaxValue).Select(b => (byte)b).ToArray();
             var lowerHex = string.Concat(buffer.Select(b => b.ToString("x2")).ToArray());
             var upperHex = string.Concat(buffer.Select(b => b.ToString("X2")).ToArray());
 
@@ -37,14 +32,14 @@ namespace Ipfs
         [TestMethod]
         public void InvalidFormatSpecifier()
         {
-            ExceptionAssert.Throws<FormatException>(() => HexString.Encode(new byte[0], "..."));
+            Assert.ThrowsException<FormatException>(() => HexString.Encode(Array.Empty<byte>(), "..."));
         }
 
         [TestMethod]
         public void InvalidHexStrings()
         {
-            ExceptionAssert.Throws<InvalidDataException>(() => HexString.Decode("0"));
-            ExceptionAssert.Throws<InvalidDataException>(() => HexString.Decode("0Z"));
+            Assert.ThrowsException<InvalidDataException>(() => HexString.Decode("0"));
+            Assert.ThrowsException<InvalidDataException>(() => HexString.Decode("0Z"));
         }
     }
 }

@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ipfs.Cryptography.BouncyDigest">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABCAQAAAAAAAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Cryptography\BouncyDigest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Cryptography.DoubleSha256">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABCAQAAgAAAAAAAAAACAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Cryptography\DoubleSha256.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Cryptography.IdentityHash">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABCAQAAAAAAAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Cryptography\IdentityHash.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Cryptography.Keccak">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAABAAAAABICEwAAgAAAgIBAABCAAAAEAABAAAAAAEA=</HashCode>
+      <FileName>Cryptography\Keccak.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Cryptography.KeccakManaged">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABCAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Cryptography\KeccakManaged.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

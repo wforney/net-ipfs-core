@@ -62,7 +62,7 @@ namespace Ipfs.Cryptography
         }
 
         public
-#if (!PORTABLE && !NETSTANDARD14)
+#if !PORTABLE && !NETSTANDARD14
         override
 #endif
         bool CanReuseTransform
@@ -125,7 +125,7 @@ namespace Ipfs.Cryptography
 
         protected ulong ROL(ulong a, int offset)
         {
-            return (((a) << ((offset) % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - ((offset) % KeccakLaneSizeInBits))));
+            return ((a) << (offset % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - (offset % KeccakLaneSizeInBits)));
         }
 
         protected void AddToBuffer(byte[] array, ref int offset, ref int count)

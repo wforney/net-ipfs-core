@@ -45,6 +45,8 @@ namespace Ipfs
         /// </param>
         public DagLink(Stream stream)
         {
+            _ = stream ?? throw new ArgumentNullException(nameof(stream));
+
             this.Id = new Cid();
             this.Name = string.Empty;
             this.Size = default;
@@ -61,6 +63,8 @@ namespace Ipfs
         /// </param>
         public DagLink(CodedInputStream stream)
         {
+            _ = stream ?? throw new ArgumentNullException(nameof(stream));
+
             this.Id = new Cid();
             this.Name = string.Empty;
             this.Size = default;

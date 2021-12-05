@@ -1,83 +1,57 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>Ipfs.Core</AssemblyName>
-    <RootNamespace>Ipfs</RootNamespace>
-    <DebugType>portable</DebugType>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	<PropertyGroup>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>.pdb;$(AllowedOutputExtensionsInPackageBuildOutputFolder)</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<AssemblyName>Ipfs.Core</AssemblyName>
+		<!-- developer build is always 0.42 -->
+		<AssemblyVersion>0.56</AssemblyVersion>
+		<Authors>Richard Schneider, Dennis Raine, William Forney</Authors>
+		<Copyright>Copyright © 2015-2021 Richard Schneider, Dennis Raine, &amp; William Forney</Copyright>
+		<DebugType>portable</DebugType>
+		<Description>
+			Core objects and interfaces for IPFS.
 
-    <!-- developer build is always 0.42 -->
-    <AssemblyVersion>0.42</AssemblyVersion>
-    <Version>0.42</Version>
+			The InterPlanetary File System is the permanent web. It is a new hypermedia distribution protocol, addressed by content and identities. IPFS enables the creation of completely distributed applications. It aims to make the web faster, safer, and more open.
+		</Description>
+		<EmbedUntrackedSources>false</EmbedUntrackedSources>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IncludeSymbols>True</IncludeSymbols>
+		<Nullable>enable</Nullable>
+		<PackageIconUrl>https://raw.githubusercontent.com/wforney/net-ipfs-core/master/doc/images/ipfs-cs-logo-64x64.png</PackageIconUrl>
+		<PackageId>Ipfs.Core</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/wforney/net-ipfs-core</PackageProjectUrl>
+		<PackageReleaseNotes>https://github.com/wforney/net-ipfs-core/releases</PackageReleaseNotes>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageTags>ipfs peer-to-peer distributed file-system</PackageTags>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<RootNamespace>Ipfs</RootNamespace>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TargetFramework>net6.0</TargetFramework>
+		<Title>IPFS Core Objects</Title>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<Version>0.56</Version>
+	</PropertyGroup>
 
-    <!-- Nuget specs -->
-    <PackageId>Ipfs.Core</PackageId>
-    <Authors>Richard Schneider</Authors>
-    <Title>IPFS Core Objects</Title>
-    <Description>
-      Core objects and interfaces for IPFS.
+	<ItemGroup>
+		<PackageReference Include="Common.Logging" Version="3.4.1" />
+		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
+		<PackageReference Include="Google.Protobuf" Version="3.19.1" />
+		<PackageReference Include="Grpc.Tools" Version="2.42.0" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.0.64" PrivateAssets="All" />
+		<PackageReference Include="murmurhash" Version="1.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+		<PackageReference Include="SimpleBase" Version="3.1.0" />
+	</ItemGroup>
 
-      The InterPlanetary File System is the permanent web. It is a new hypermedia distribution protocol, addressed by content and identities. IPFS enables the creation of completely distributed applications. It aims to make the web faster, safer, and more open.
-    </Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>https://github.com/richardschneider/net-ipfs-core/releases</PackageReleaseNotes>
-    <Copyright>© 2015-2019 Richard Schneider</Copyright>
-    <PackageTags>ipfs peer-to-peer distributed file-system</PackageTags>
-    <IncludeSymbols>True</IncludeSymbols>
-    <PackageProjectUrl>https://github.com/richardschneider/net-ipfs-core</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/richardschneider/net-ipfs-core/master/doc/images/ipfs-cs-logo-64x64.png</PackageIconUrl>
-
-    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>false</EmbedUntrackedSources>
-    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>.pdb;$(AllowedOutputExtensionsInPackageBuildOutputFolder)</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Common.Logging" Version="3.4.1" />
-    <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
-    <PackageReference Include="Google.Protobuf" Version="3.19.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.5.2" />
-    <PackageReference Include="SimpleBase" Version="2.0.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.42.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.0.64" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="**/*.proto" />
-    <EmbeddedResource Include="**/*.proto" />
-  </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard14'">
-    <DefineConstants>NETSTANDARD14</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0'">
-    <DefineConstants>ASYNCSTREAM</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
+	<ItemGroup>
+		<Protobuf Include="**/*.proto" />
+		<EmbeddedResource Include="**/*.proto" />
+	</ItemGroup>
 
 </Project>

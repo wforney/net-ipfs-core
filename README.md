@@ -12,9 +12,7 @@ The core objects and interfaces of the [IPFS](https://github.com/ipfs/ipfs) (Int
 The interplanetary file system is the permanent web. It is a new hypermedia distribution protocol, addressed by content and identities. IPFS enables the creation of completely distributed applications. It aims to make the web faster, safer, and more open.
 
 It supports the following runtimes
-- .NET Framework 4.5
-- .NET Standard 1.4
-- .NET Standard 2.0
+- .NET 6.0
 
 More information is on the [Documentation](https://richardschneider.github.io/net-ipfs-core/) web site.
 
@@ -45,7 +43,7 @@ All hashes in IPFS are encoded with [multihash](https://github.com/multiformats/
 
 ### MultiAddress
 
-A standard way to represent a networks address that supports [multiple network protocols](https://github.com/multiformats/multiaddr). It is represented as a series of tuples, a protocol code and an optional value.  For example, an IPFS file at a sepcific address over ipv4 and tcp is 
+A standard way to represent a networks address that supports [multiple network protocols](https://github.com/multiformats/multiaddr). It is represented as a series of tuples, a protocol code and an optional value.  For example, an IPFS file at a specific address over ipv4 and tcp is 
 
     /ip4/10.1.10.10/tcp/80/ipfs/QmVcSqVEsvm5RR9mBLjwpb2XjFVn5bPdPL69mL8PH45pPC
 
@@ -73,7 +71,7 @@ Most binary data (objects) in IPFS is represented as a [Base-58](https://en.wiki
 - [Peer Talk](https://github.com/richardschneider/peer-talk) - Peer to peer communication.
 
 ## License
-Copyright © 2015-2019 Richard Schneider (makaretu@gmail.com)
+Copyright © 2015-2021 Richard Schneider (makaretu@gmail.com), Dennis Raine, and William Forney.
 
 The IPFS Core library is licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form") license. Refer to the [LICENSE](https://github.com/richardschneider/net-ipfs-core/blob/master/LICENSE) file for more information.
 

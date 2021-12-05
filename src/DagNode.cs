@@ -31,10 +31,10 @@ namespace Ipfs
         ///   The name of the hashing algorithm to use; defaults to
         ///   <see cref="MultiHash.DefaultAlgorithmName"/>.
         /// </param>
-        public DagNode(byte[] data, IEnumerable<IMerkleLink>? links = null, string hashAlgorithm = MultiHash.DefaultAlgorithmName)
+        public DagNode(byte[]? data = null, IEnumerable<IMerkleLink>? links = null, string hashAlgorithm = MultiHash.DefaultAlgorithmName)
         {
-            this.DataBytes = data ?? (new byte[0]);
-            this.Links = (links ?? (new DagLink[0]))
+            this.DataBytes = data ?? (Array.Empty<byte>());
+            this.Links = (links ?? (Array.Empty<DagLink>()))
                 .OrderBy(link => link.Name ?? "");
             this.hashAlgorithm = hashAlgorithm;
         }
@@ -47,8 +47,9 @@ namespace Ipfs
         ///   A <see cref="Stream"/> containing the binary representation of the
         ///   <b>DagNode</b>.
         /// </param>
-        public DagNode(Stream stream)
+        public DagNode(Stream? stream)
         {
+            _ = stream ?? throw new ArgumentNullException(nameof(stream));
             Read(stream);
         }
 
@@ -60,8 +61,9 @@ namespace Ipfs
         ///   A <see cref="CodedInputStream"/> containing the binary representation of the
         ///   <b>DagNode</b>.
         /// </param>
-        public DagNode(CodedInputStream stream)
+        public DagNode(CodedInputStream? stream)
         {
+            _ = stream ?? throw new ArgumentNullException(nameof(stream));
             Read(stream);
         }
 
@@ -217,10 +219,8 @@ namespace Ipfs
         /// </param>
         public void Write(Stream stream)
         {
-            using (var cos = new CodedOutputStream(stream, true))
-            {
-                Write(cos);
-            }
+            using var cos = new CodedOutputStream(stream, true);
+            Write(cos);
         }
 
         /// <summary>
@@ -236,14 +236,12 @@ namespace Ipfs
 
             foreach (var link in Links.Select(l => new DagLink(l)))
             {
-                using (var linkStream = new MemoryStream())
-                {
-                    link.Write(linkStream);
-                    var msg = linkStream.ToArray();
-                    stream.WriteTag(2, WireFormat.WireType.LengthDelimited);
-                    stream.WriteLength(msg.Length);
-                    stream.WriteSomeBytes(msg);
-                }
+                using var linkStream = new MemoryStream();
+                link.Write(linkStream);
+                var msg = linkStream.ToArray();
+                stream.WriteTag(2, WireFormat.WireType.LengthDelimited);
+                stream.WriteLength(msg.Length);
+                stream.WriteSomeBytes(msg);
             }
 
             if (DataBytes.Length > 0)
@@ -256,10 +254,8 @@ namespace Ipfs
 
         private void Read(Stream stream)
         {
-            using (var cis = new CodedInputStream(stream, true))
-            {
-                Read(cis);
-            }
+            using var cis = new CodedInputStream(stream, true);
+            Read(cis);
         }
 
         private void Read(CodedInputStream stream)
@@ -288,7 +284,7 @@ namespace Ipfs
             }
 
             if (DataBytes == null)
-                DataBytes = new byte[0];
+                DataBytes = Array.Empty<byte>();
             Links = links.ToArray();
         }
 
@@ -300,31 +296,25 @@ namespace Ipfs
         /// </returns>
         public byte[] ToArray()
         {
-            using (var ms = new MemoryStream())
-            {
-                Write(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            Write(ms);
+            return ms.ToArray();
         }
 
         private void ComputeHash()
         {
-            using (var ms = new MemoryStream())
-            {
-                Write(ms);
-                size = ms.Position;
-                ms.Position = 0;
-                id = MultiHash.ComputeHash(ms, hashAlgorithm);
-            }
+            using var ms = new MemoryStream();
+            Write(ms);
+            size = ms.Position;
+            ms.Position = 0;
+            id = MultiHash.ComputeHash(ms, hashAlgorithm);
         }
 
         private void ComputeSize()
         {
-            using (var ms = new MemoryStream())
-            {
-                Write(ms);
-                size = ms.Position;
-            }
+            using var ms = new MemoryStream();
+            Write(ms);
+            size = ms.Position;
         }
     }
 

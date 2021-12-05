@@ -1,8 +1,5 @@
 using Ipfs.Registry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Ipfs
@@ -24,26 +21,26 @@ namespace Ipfs
         public void Encode_Unknown_Algorithm()
         {
             var bytes = new byte[] { 1, 2, 3, 4, 5 };
-            ExceptionAssert.Throws<KeyNotFoundException>(() => MultiBase.Encode(bytes, "unknown"));
+            Assert.ThrowsException<KeyNotFoundException>(() => MultiBase.Encode(bytes, "unknown"));
         }
 
         [TestMethod]
         public void Encode_Null_Data_Not_Allowed()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBase.Encode(null));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBase.Encode(null));
         }
 
         [TestMethod]
         public void Decode_Bad_Formats()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBase.Decode(null));
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBase.Decode(""));
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBase.Decode("   "));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBase.Decode(null));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBase.Decode(""));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBase.Decode("   "));
 
-            ExceptionAssert.Throws<FormatException>(() => MultiBase.Decode("?"));
-            ExceptionAssert.Throws<FormatException>(() => MultiBase.Decode("??"));
-            ExceptionAssert.Throws<FormatException>(() => MultiBase.Decode("???"));
-            ExceptionAssert.Throws<FormatException>(() => MultiBase.Decode("fXX"));
+            Assert.ThrowsException<FormatException>(() => MultiBase.Decode("?"));
+            Assert.ThrowsException<FormatException>(() => MultiBase.Decode("??"));
+            Assert.ThrowsException<FormatException>(() => MultiBase.Decode("???"));
+            Assert.ThrowsException<FormatException>(() => MultiBase.Decode("fXX"));
         }
 
         private class TestVector
@@ -201,7 +198,7 @@ namespace Ipfs
         [TestMethod]
         public void EmptyData()
         {
-            var empty = new byte[0];
+            var empty = Array.Empty<byte>();
             foreach (var alg in MultiBaseAlgorithm.All)
             {
                 var s = MultiBase.Encode(empty, alg.Name);
@@ -214,8 +211,8 @@ namespace Ipfs
         {
             foreach (var alg in MultiBaseAlgorithm.All)
             {
-                var bad = alg.Code + "?";
-                ExceptionAssert.Throws<FormatException>(() => MultiBase.Decode(bad));
+                var bad = $"{alg.Code}?";
+                Assert.ThrowsException<FormatException>(() => MultiBase.Decode(bad));
             }
         }
 

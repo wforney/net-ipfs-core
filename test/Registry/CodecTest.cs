@@ -1,10 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Google.Protobuf;
 
 namespace Ipfs.Registry
 {
@@ -14,21 +8,21 @@ namespace Ipfs.Registry
         [TestMethod]
         public void Bad_Name()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => Codec.Register(null, 1));
-            ExceptionAssert.Throws<ArgumentNullException>(() => Codec.Register("", 1));
-            ExceptionAssert.Throws<ArgumentNullException>(() => Codec.Register("   ", 1));
+            Assert.ThrowsException<ArgumentNullException>(() => Codec.Register(null, 1));
+            Assert.ThrowsException<ArgumentNullException>(() => Codec.Register("", 1));
+            Assert.ThrowsException<ArgumentNullException>(() => Codec.Register("   ", 1));
         }
 
         [TestMethod]
         public void Name_Already_Exists()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => Codec.Register("raw", 1));
+            Assert.ThrowsException<ArgumentException>(() => Codec.Register("raw", 1));
         }
 
         [TestMethod]
         public void Code_Already_Exists()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => Codec.Register("raw-x", 0x55));
+            Assert.ThrowsException<ArgumentException>(() => Codec.Register("raw-x", 0x55));
         }
 
         [TestMethod]

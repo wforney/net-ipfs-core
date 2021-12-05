@@ -23,7 +23,7 @@ namespace Ipfs
         /// <summary>
         /// Occurs when an unknown hashing algorithm number is parsed.
         /// </summary>
-        public static EventHandler<UnknownHashingAlgorithmEventArgs>? UnknownHashingAlgorithm;
+        public static EventHandler<UnknownHashingAlgorithmEventArgs>? UnknownHashingAlgorithm { get; set; }
 
         private static readonly ILog log = LogManager.GetLogger<MultiHash>();
 
@@ -42,7 +42,7 @@ namespace Ipfs
         /// A valid IPFS hashing algorithm name, e.g. "sha2-256" or "sha2-512".
         /// </param>
         /// <param name="digest">The digest value as a byte array.</param>
-        public MultiHash(string algorithmName, byte[] digest)
+        public MultiHash(string? algorithmName, byte[]? digest)
         {
             if (algorithmName is null)
             {

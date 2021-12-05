@@ -1,9 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.Net;
 
@@ -36,13 +31,13 @@ namespace Ipfs
         [TestMethod]
         public void Unknown_Protocol_Name()
         {
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/foobar/123"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/foobar/123"));
         }
 
         [TestMethod]
         public void Missing_Protocol_Name()
         {
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/"));
         }
 
         [TestMethod]
@@ -99,26 +94,26 @@ namespace Ipfs
         public void Bad_Port()
         {
             var tcp = new MultiAddress("/tcp/65535");
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/tcp/x"));
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/tcp/65536"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/tcp/x"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/tcp/65536"));
 
             var udp = new MultiAddress("/udp/65535");
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/upd/x"));
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/udp/65536"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/upd/x"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/udp/65536"));
         }
 
         [TestMethod]
         public void Bad_IPAddress()
         {
             var ipv4 = new MultiAddress("/ip4/127.0.0.1");
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/ip4/x"));
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/ip4/127."));
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/ip4/::1"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/ip4/x"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/ip4/127."));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/ip4/::1"));
 
             var ipv6 = new MultiAddress("/ip6/::1");
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/ip6/x"));
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/ip6/03:"));
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("/ip6/127.0.0.1"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/ip6/x"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/ip6/03:"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("/ip6/127.0.0.1"));
         }
 
         [TestMethod]
@@ -135,9 +130,9 @@ namespace Ipfs
             };
             foreach (var badCase in badCases)
             {
-                ExceptionAssert.Throws<Exception>(() => new MultiAddress(badCase));
+                Assert.ThrowsException<Exception>(() => new MultiAddress(badCase));
             }
-         }
+        }
 
         [TestMethod]
         public void RoundTripping()
@@ -187,14 +182,14 @@ namespace Ipfs
         [TestMethod]
         public void Reading_Invalid_Code()
         {
-            ExceptionAssert.Throws<InvalidDataException>(() => new MultiAddress(new byte[] { 0x7F }));
+            Assert.ThrowsException<InvalidDataException>(() => new MultiAddress(new byte[] { 0x7F }));
         }
 
 
         [TestMethod]
         public void Reading_Invalid_Text()
         {
-            ExceptionAssert.Throws<FormatException>(() => new MultiAddress("tcp/80"));
+            Assert.ThrowsException<FormatException>(() => new MultiAddress("tcp/80"));
         }
 
         [TestMethod]
@@ -259,7 +254,7 @@ namespace Ipfs
         public void PeerID_Missing()
         {
             var ma = new MultiAddress("/ip4/10.1.10.10/tcp/29087");
-            ExceptionAssert.Throws<Exception>(() =>
+            Assert.ThrowsException<Exception>(() =>
             {
                 var _ = ma.PeerId;
             });
@@ -349,7 +344,7 @@ namespace Ipfs
             ma1 = new MultiAddress($"/ip4/127.0.0.1/tcp/4001/p2p/{id}");
             Assert.AreSame(ma1, ma1.WithPeerId(id));
 
-            ExceptionAssert.Throws<Exception>(() =>
+            Assert.ThrowsException<Exception>(() =>
             {
                 ma1 = new MultiAddress($"/ip4/127.0.0.1/tcp/4001/ipfs/{id3}");
                 Assert.AreSame(ma1, ma1.WithPeerId(id));

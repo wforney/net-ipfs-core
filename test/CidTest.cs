@@ -1,11 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Google.Protobuf;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
-using Google.Protobuf;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Ipfs
 {
@@ -46,7 +42,7 @@ namespace Ipfs
         public void ToString_InvalidFormat()
         {
             var cid = new Cid { Hash = new MultiHash("QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V") };
-            ExceptionAssert.Throws<FormatException>(() => cid.ToString("?"));
+            Assert.ThrowsException<FormatException>(() => cid.ToString("?"));
         }
 
         [TestMethod]
@@ -83,14 +79,14 @@ namespace Ipfs
             cid = new Cid
             {
                 ContentType = "dag-pb",
-                Encoding = "base58btc",             
+                Encoding = "base58btc",
                 Hash = hash
             };
             Assert.AreEqual(hash, cid.Encode());
             Assert.AreEqual(0, cid.Version);
         }
 
-    [TestMethod]
+        [TestMethod]
         public void Encode_V1()
         {
             var cid = new Cid
@@ -255,8 +251,8 @@ namespace Ipfs
             var a0 = Cid.Decode("zb2rhj7crUKTQYRGCRATFaQ6YFLTde2YzdqbbhAASkL9uRDXn");
             var a1 = Cid.Decode("zb2rhj7crUKTQYRGCRATFaQ6YFLTde2YzdqbbhAASkL9uRDXn");
             var b = Cid.Decode("QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L5");
-            Cid c = null;
-            Cid d = null;
+            Cid? c = null;
+            Cid? d = null;
 
             Assert.IsTrue(c == d);
             Assert.IsFalse(c == b);
@@ -386,22 +382,22 @@ namespace Ipfs
         {
             Cid cid = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4";
             Assert.AreEqual("QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4", cid.Encode());
-            ExceptionAssert.Throws<NotSupportedException>(() => cid.ContentType = "dag-cbor");
-            ExceptionAssert.Throws<NotSupportedException>(() => cid.Encoding = "base64");
-            ExceptionAssert.Throws<NotSupportedException>(() => cid.Hash = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L5");
-            ExceptionAssert.Throws<NotSupportedException>(() => cid.Version = 0);
+            Assert.ThrowsException<NotSupportedException>(() => cid.ContentType = "dag-cbor");
+            Assert.ThrowsException<NotSupportedException>(() => cid.Encoding = "base64");
+            Assert.ThrowsException<NotSupportedException>(() => cid.Hash = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L5");
+            Assert.ThrowsException<NotSupportedException>(() => cid.Version = 0);
         }
 
         private class CidAndX
         {
-            public Cid Cid;
+            public Cid? Cid;
             public int X;
         }
 
         [TestMethod]
         public void JsonSerialization()
         {
-            Cid a = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4";
+            Cid? a = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4";
             string json = JsonConvert.SerializeObject(a);
             Assert.AreEqual($"\"{a.Encode()}\"", json);
             var b = JsonConvert.DeserializeObject<Cid>(json);
@@ -412,9 +408,9 @@ namespace Ipfs
             b = JsonConvert.DeserializeObject<Cid>(json);
             Assert.IsNull(b);
 
-            var x = new CidAndX { Cid = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4", X = 42 };
+            CidAndX x = new() { Cid = "QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4", X = 42 };
             json = JsonConvert.SerializeObject(x);
-            var y = JsonConvert.DeserializeObject<CidAndX>(json);
+            CidAndX y = JsonConvert.DeserializeObject<CidAndX>(json) ?? throw new ArgumentNullException();
             Assert.AreEqual(x.Cid, y.Cid);
             Assert.AreEqual(x.X, y.X);
 

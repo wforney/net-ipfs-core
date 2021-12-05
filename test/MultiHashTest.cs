@@ -1,12 +1,8 @@
+using Google.Protobuf;
 using Ipfs.Registry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Google.Protobuf;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Ipfs
 {
@@ -25,28 +21,29 @@ namespace Ipfs
         [TestMethod]
         public void Unknown_Hash_Name()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => new MultiHash(null, new byte[0]));
-            ExceptionAssert.Throws<ArgumentException>(() => new MultiHash("", new byte[0]));
-            ExceptionAssert.Throws<ArgumentException>(() => new MultiHash("md5", new byte[0]));
+            Assert.ThrowsException<ArgumentNullException>(() => new MultiHash(null, Array.Empty<byte>()));
+            Assert.ThrowsException<ArgumentException>(() => new MultiHash("", Array.Empty<byte>()));
+            Assert.ThrowsException<ArgumentException>(() => new MultiHash("md5", Array.Empty<byte>()));
         }
 
         [TestMethod]
         public void Write_Null_Stream()
         {
             var mh = new MultiHash("QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB");
-            ExceptionAssert.Throws<ArgumentNullException>(() => mh.Write((CodedOutputStream)null));
+            Assert.ThrowsException<ArgumentNullException>(() => mh.Write((CodedOutputStream)null));
         }
 
         [TestMethod]
         public void Parsing_Unknown_Hash_Number()
         {
             HashingAlgorithm unknown = null;
-            EventHandler<UnknownHashingAlgorithmEventArgs> unknownHandler = (s, e) => { unknown = e.Algorithm; };
+            EventHandler<UnknownHashingAlgorithmEventArgs> unknownHandler = (s, e) => unknown = e.Algorithm;
             var ms = new MemoryStream(new byte[] { 0x01, 0x02, 0x0a, 0x0b });
             MultiHash.UnknownHashingAlgorithm += unknownHandler;
             try
             {
                 var mh = new MultiHash(ms);
+                Assert.IsNotNull(mh.Algorithm);
                 Assert.AreEqual("ipfs-1", mh.Algorithm.Name);
                 Assert.AreEqual("ipfs-1", mh.Algorithm.ToString());
                 Assert.AreEqual(1, mh.Algorithm.Code);
@@ -68,21 +65,22 @@ namespace Ipfs
         public void Parsing_Wrong_Digest_Size()
         {
             var ms = new MemoryStream(new byte[] { 0x11, 0x02, 0x0a, 0x0b });
-            ExceptionAssert.Throws<InvalidDataException>(() => new MultiHash(ms));
+            Assert.ThrowsException<InvalidDataException>(() => new MultiHash(ms));
         }
 
         [TestMethod]
         public void Invalid_Digest()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => new MultiHash("sha1", null));
-            ExceptionAssert.Throws<ArgumentException>(() => new MultiHash("sha1", new byte[0]));
-            ExceptionAssert.Throws<ArgumentException>(() => new MultiHash("sha1", new byte[21]));
+            Assert.ThrowsException<ArgumentNullException>(() => new MultiHash("sha1", null));
+            Assert.ThrowsException<ArgumentException>(() => new MultiHash("sha1", Array.Empty<byte>()));
+            Assert.ThrowsException<ArgumentException>(() => new MultiHash("sha1", new byte[21]));
         }
 
         [TestMethod]
         public void Base58_Encode_Decode()
         {
             var mh = new MultiHash("QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB");
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual("sha2-256", mh.Algorithm.Name);
             Assert.AreEqual(32, mh.Digest.Length);
             Assert.AreEqual("QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB", mh.ToBase58());
@@ -92,6 +90,7 @@ namespace Ipfs
         public void Base32_Encode()
         {
             var mh = new MultiHash("QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB");
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual("sha2-256", mh.Algorithm.Name);
             Assert.AreEqual(32, mh.Digest.Length);
             Assert.AreEqual("ciqbed3k6ya5i3qqwljochwxdrk5exzqilbckapedujenz5b5hj5r3a", mh.ToBase32());
@@ -102,6 +101,7 @@ namespace Ipfs
         {
             var hello = Encoding.UTF8.GetBytes("Hello, world.");
             var mh = MultiHash.ComputeHash(hello);
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual(MultiHash.DefaultAlgorithmName, mh.Algorithm.Name);
             Assert.IsNotNull(mh.Digest);
         }
@@ -112,6 +112,7 @@ namespace Ipfs
             var hello = new MemoryStream(Encoding.UTF8.GetBytes("Hello, world."));
             hello.Position = 0;
             var mh = MultiHash.ComputeHash(hello);
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual(MultiHash.DefaultAlgorithmName, mh.Algorithm.Name);
             Assert.IsNotNull(mh.Digest);
         }
@@ -123,7 +124,7 @@ namespace Ipfs
             try
             {
                 var hello = Encoding.UTF8.GetBytes("Hello, world.");
-                ExceptionAssert.Throws<NotImplementedException>(() => MultiHash.ComputeHash(hello, "not-implemented"));
+                Assert.ThrowsException<NotImplementedException>(() => MultiHash.ComputeHash(hello, "not-implemented"));
             }
             finally
             {
@@ -209,8 +210,8 @@ namespace Ipfs
             var a0 = new MultiHash("QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4");
             var a1 = new MultiHash("QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4");
             var b = new MultiHash("QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L5");
-            MultiHash c = null;
-            MultiHash d = null;
+            MultiHash? c = null;
+            MultiHash? d = null;
 
             Assert.IsTrue(c == d);
             Assert.IsFalse(c == b);
@@ -253,6 +254,7 @@ namespace Ipfs
             var concise = "1220f8c3bf62a9aa3e6fc1619c250e48abe7519373d3edf41be62eb5dc45199af2ef"
                 .ToHexBuffer();
             var mh = new MultiHash(new MemoryStream(concise, false));
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual("sha2-256", mh.Algorithm.Name);
             Assert.AreEqual(0x12, mh.Algorithm.Code);
             Assert.AreEqual(0x20, mh.Algorithm.DigestSize);
@@ -260,6 +262,7 @@ namespace Ipfs
             var longer = "9200a000f8c3bf62a9aa3e6fc1619c250e48abe7519373d3edf41be62eb5dc45199af2ef"
                 .ToHexBuffer();
             mh = new MultiHash(new MemoryStream(longer, false));
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual("sha2-256", mh.Algorithm.Name);
             Assert.AreEqual(0x12, mh.Algorithm.Code);
             Assert.AreEqual(0x20, mh.Algorithm.DigestSize);
@@ -272,8 +275,9 @@ namespace Ipfs
             {
                 try
                 {
-                    var mh = MultiHash.ComputeHash(new byte[0], alg.Name);
+                    var mh = MultiHash.ComputeHash(Array.Empty<byte>(), alg.Name);
                     Assert.IsNotNull(mh, alg.Name);
+                    Assert.IsNotNull(mh.Algorithm);
                     Assert.AreEqual(alg.Code, mh.Algorithm.Code, alg.Name);
                     Assert.AreEqual(alg.Name, mh.Algorithm.Name, alg.Name);
                     Assert.AreEqual(alg.DigestSize, mh.Algorithm.DigestSize, alg.Name);
@@ -291,8 +295,9 @@ namespace Ipfs
         {
             var hello = Encoding.UTF8.GetBytes("Hello world");
             var mh = MultiHash.ComputeHash(hello, "sha2-256");
-            Console.WriteLine($"| hash code | 0x{mh.Algorithm.Code.ToString("x")} |");
-            Console.WriteLine($"| digest length | 0x{mh.Digest.Length.ToString("x")} |");
+            Assert.IsNotNull(mh.Algorithm);
+            Console.WriteLine($"| hash code | 0x{mh.Algorithm.Code:x} |");
+            Console.WriteLine($"| digest length | 0x{mh.Digest.Length:x} |");
             Console.WriteLine($"| digest value | {mh.Digest.ToHexString()} |");
             Console.WriteLine($"| binary | {mh.ToArray().ToHexString()} |");
             Console.WriteLine($"| base 58 | {mh.ToBase58()} |");
@@ -429,11 +434,9 @@ namespace Ipfs
             {
                 if (v.Ignore) continue;
                 var bytes = Encoding.UTF8.GetBytes(v.Input);
-                using (var ms = new MemoryStream(bytes, false))
-                {
-                    var mh = MultiHash.ComputeHash(ms, v.Algorithm);
-                    Assert.AreEqual(v.Output, mh.ToArray().ToHexString(), v.Algorithm);
-                }
+                using var ms = new MemoryStream(bytes, false);
+                var mh = MultiHash.ComputeHash(ms, v.Algorithm);
+                Assert.AreEqual(v.Output, mh.ToArray().ToHexString(), v.Algorithm);
             }
         }
 
@@ -464,11 +467,13 @@ namespace Ipfs
         public void Binary()
         {
             var mh = new MultiHash("QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB");
+            Assert.IsNotNull(mh.Algorithm);
             Assert.AreEqual("sha2-256", mh.Algorithm.Name);
             Assert.AreEqual(32, mh.Digest.Length);
 
             var binary = mh.ToArray();
             var mh1 = new MultiHash(binary);
+            Assert.IsNotNull(mh1.Algorithm);
             Assert.AreEqual(mh.Algorithm.Name, mh1.Algorithm.Name);
             CollectionAssert.AreEqual(mh.Digest, mh1.Digest);
         }
@@ -478,7 +483,7 @@ namespace Ipfs
         {
             var a = new MultiHash("QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB");
             string json = JsonConvert.SerializeObject(a);
-            Assert.AreEqual($"\"{a.ToString()}\"", json);
+            Assert.AreEqual($"\"{a}\"", json);
             var b = JsonConvert.DeserializeObject<MultiHash>(json);
             Assert.AreEqual(a, b);
 
@@ -492,7 +497,7 @@ namespace Ipfs
         public void CodeToName()
         {
             Assert.AreEqual("sha2-512", MultiHash.GetHashAlgorithmName(0x13));
-            ExceptionAssert.Throws<KeyNotFoundException>(
+            Assert.ThrowsException<KeyNotFoundException>(
                 () => MultiHash.GetHashAlgorithmName(0xbadbad));
         }
 
@@ -501,7 +506,7 @@ namespace Ipfs
         {
             Assert.IsNotNull(MultiHash.GetHashAlgorithm());
             Assert.IsNotNull(MultiHash.GetHashAlgorithm("sha2-512"));
-            var e = ExceptionAssert.Throws<KeyNotFoundException>(() =>
+            var e = Assert.ThrowsException<KeyNotFoundException>(() =>
             {
                 var _ = MultiHash.GetHashAlgorithm("unknown");
             });

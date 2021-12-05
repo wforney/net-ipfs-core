@@ -96,7 +96,7 @@ namespace Ipfs
 
             try
             {
-                return alg.Decode(s.Substring(1));
+                return alg.Decode(s[1..]);
             }
             catch (Exception e)
             {

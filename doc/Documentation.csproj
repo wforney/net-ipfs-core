@@ -1,14 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0</TargetFrameworks>
-		<Title>WebApplication1</Title>
-		<Description></Description>
 		<Company></Company>
-		<Product>WebApplication1</Product>
 		<Copyright>Copyright © 2016</Copyright>
-		<Version>1.0.0.0</Version>
+		<Description></Description>
 		<FileVersion>1.0.0.0</FileVersion>
+		<IncludeSymbols>true</IncludeSymbols>
+		<Product>WebApplication1</Product>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Title>WebApplication1</Title>
+		<Version>1.0.0.0</Version>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+	</ItemGroup>
 
 </Project>

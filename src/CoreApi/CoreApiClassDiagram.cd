@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ipfs.CoreApi.AddFileOptions">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAACAIAAAAAAAAGAAAAgAAIAAAAAgIAAACAAAA=</HashCode>
+      <FileName>CoreApi\AddFileOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.BandwidthData">
+    <Position X="2.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAQAAAAAAAAAAACAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>CoreApi\BandwidthData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.BitswapData">
+    <Position X="4" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAUAAAAAICAAgBgAAAAAAAAQ=</HashCode>
+      <FileName>CoreApi\BitswapData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.BitswapLedger">
+    <Position X="6" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAABCAAAAAAAAAAAIAAAgAAAAAQAAAAA=</HashCode>
+      <FileName>CoreApi\BitswapLedger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.ObjectStat">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQEAAAAAAAAAAAAAQAAAAAAAAAAiAAAAA=</HashCode>
+      <FileName>CoreApi\ObjectStat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.PingResult">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAACAAAAQA=</HashCode>
+      <FileName>CoreApi\PingResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.RepositoryData">
+    <Position X="2.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAQAAAAAAACQAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>CoreApi\RepositoryData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.CoreApi.TransferProgress">
+    <Position X="4" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>CoreApi\TransferProgress.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Ipfs.CoreApi.IBitswapApi">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAABAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>CoreApi\IBitswapApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IBlockApi">
+    <Position X="8.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAIACAAAA=</HashCode>
+      <FileName>CoreApi\IBlockApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IBlockRepositoryApi">
+    <Position X="10.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAADAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>CoreApi\IBlockRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IBootstrapApi">
+    <Position X="13" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAgAAAEAAAAAIAAAAAEAAAAAAAA=</HashCode>
+      <FileName>CoreApi\IBootstrapApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IConfigApi">
+    <Position X="15" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAACAAA=</HashCode>
+      <FileName>CoreApi\IConfigApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IContentRouting">
+    <Position X="0.5" Y="2.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreApi\IContentRouting.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.ICoreApi">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABEEAAKAIgAAAAQgAAACQAQIAAAAAEAAhAAAgAAAAAA=</HashCode>
+      <FileName>CoreApi\ICoreApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IDagApi">
+    <Position X="19" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>CoreApi\IDagApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IDhtApi">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreApi\IDhtApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IDnsApi">
+    <Position X="9" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>CoreApi\IDnsApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IFileSystemApi">
+    <Position X="10.75" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAAAAAAAAAACAAEAEAAAAAAAAIAAIABAAAA=</HashCode>
+      <FileName>CoreApi\IFileSystemApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IGenericApi">
+    <Position X="13.25" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAABAAAAAAAAAgAAAAQAAAAAAgAAA=</HashCode>
+      <FileName>CoreApi\IGenericApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IKeyApi">
+    <Position X="9.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAgAAAAAQAgAIAAAAAAAAIAAAAA=</HashCode>
+      <FileName>CoreApi\IKeyApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.INameApi">
+    <Position X="11.5" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>CoreApi\INameApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IObjectApi">
+    <Position X="14" Y="5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAQAAQBAAAAAAAAAAAAAAAAAAAAABIACAAAA=</HashCode>
+      <FileName>CoreApi\IObjectApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IPeerRouting">
+    <Position X="2.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreApi\IPeerRouting.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IPinApi">
+    <Position X="16.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAEAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreApi\IPinApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IPubSubApi">
+    <Position X="18" Y="5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAACAAAAAAAAAAAAAAAAAIAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoreApi\IPubSubApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IStatsApi">
+    <Position X="9.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAgAAAAAAAg=</HashCode>
+      <FileName>CoreApi\IStatsApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.ISwarmApi">
+    <Position X="11.5" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAACAAAAAAAAAIAIAAAAAAgAAAAAAAAAgAAQAAA=</HashCode>
+      <FileName>CoreApi\ISwarmApi.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.CoreApi.IValueStore">
+    <Position X="4.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>CoreApi\IValueStore.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

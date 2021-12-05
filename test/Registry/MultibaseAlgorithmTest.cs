@@ -1,10 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Google.Protobuf;
 
 namespace Ipfs.Registry
 {
@@ -14,21 +8,21 @@ namespace Ipfs.Registry
         [TestMethod]
         public void Bad_Name()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBaseAlgorithm.Register(null, '?'));
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBaseAlgorithm.Register("", '?'));
-            ExceptionAssert.Throws<ArgumentNullException>(() => MultiBaseAlgorithm.Register("   ", '?'));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBaseAlgorithm.Register(null, '?'));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBaseAlgorithm.Register("", '?'));
+            Assert.ThrowsException<ArgumentNullException>(() => MultiBaseAlgorithm.Register("   ", '?'));
         }
 
         [TestMethod]
         public void Name_Already_Exists()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => MultiBaseAlgorithm.Register("base58btc", 'z'));
+            Assert.ThrowsException<ArgumentException>(() => MultiBaseAlgorithm.Register("base58btc", 'z'));
         }
 
         [TestMethod]
         public void Code_Already_Exists()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => MultiBaseAlgorithm.Register("base58btc-x", 'z'));
+            Assert.ThrowsException<ArgumentException>(() => MultiBaseAlgorithm.Register("base58btc-x", 'z'));
         }
 
         [TestMethod]
@@ -58,14 +52,14 @@ namespace Ipfs.Registry
             }
         }
 
-        [TestMethod] 
+        [TestMethod]
         public void Known_But_NYI()
         {
             var alg = MultiBaseAlgorithm.Register("nyi", 'n');
             try
             {
-                ExceptionAssert.Throws<NotImplementedException>(() => alg.Encode(null));
-                ExceptionAssert.Throws<NotImplementedException>(() => alg.Decode(null));
+                Assert.ThrowsException<NotImplementedException>(() => alg.Encode(null));
+                Assert.ThrowsException<NotImplementedException>(() => alg.Decode(null));
             }
             finally
             {

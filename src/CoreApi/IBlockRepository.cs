@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs.CoreApi
+﻿namespace Ipfs.CoreApi
 {
     /// <summary>
     ///   Manages all the blocks stored locally.
@@ -21,7 +15,7 @@ namespace Ipfs.CoreApi
         /// <returns>
         ///   TODO: not sure what this should return.
         /// </returns>
-        Task RemoveGarbageAsync(CancellationToken cancel = default(CancellationToken));
+        Task RemoveGarbageAsync(CancellationToken cancel = default);
 
         /// <summary>
         ///   Get statistics on the repository.
@@ -36,7 +30,7 @@ namespace Ipfs.CoreApi
         /// <remarks>
         ///   Same as <see cref="IStatsApi.RepositoryAsync(CancellationToken)"/>.
         /// </remarks>
-        Task<RepositoryData> StatisticsAsync(CancellationToken cancel = default(CancellationToken));
+        Task<RepositoryData> StatisticsAsync(CancellationToken cancel = default);
 
         /// <summary>
         ///   Verify all blocks in repo are not corrupted.
@@ -47,7 +41,7 @@ namespace Ipfs.CoreApi
         /// <returns>
         ///   TODO: not sure what this should return.
         /// </returns>
-        Task VerifyAsync(CancellationToken cancel = default(CancellationToken));
+        Task VerifyAsync(CancellationToken cancel = default);
 
         /// <summary>
         ///   Gets the version number of the repo.
@@ -59,6 +53,6 @@ namespace Ipfs.CoreApi
         ///   A task that represents the asynchronous operation. The task's result is
         ///   the version number of the data block repository.
         /// </returns>
-        Task<string> VersionAsync(CancellationToken cancel = default(CancellationToken));
+        Task<string> VersionAsync(CancellationToken cancel = default);
     }
 }

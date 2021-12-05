@@ -8,7 +8,7 @@
     /// </remarks>
     public class Peer : IEquatable<Peer>
     {
-        private static MultiAddress[] noAddress = new MultiAddress[0];
+        private static readonly MultiAddress[] noAddress = Array.Empty<MultiAddress>();
         private const string unknown = "unknown/0.0";
 
         /// <summary>

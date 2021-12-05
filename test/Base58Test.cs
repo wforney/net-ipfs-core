@@ -37,7 +37,7 @@ public class Base58Test
     [TestMethod]
     public void Decode_Bad()
     {
-        ExceptionAssert.Throws<ArgumentException>(() => Base58.Decode("jo91waLQA1NNeBmZKUF=="));
+        Assert.ThrowsException<ArgumentException>(() => Base58.Decode("jo91waLQA1NNeBmZKUF=="));
     }
 
     [TestMethod]

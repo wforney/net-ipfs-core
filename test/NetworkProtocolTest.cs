@@ -1,11 +1,5 @@
-using Ipfs;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using Google.Protobuf;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ipfs
 {
@@ -21,13 +15,13 @@ namespace Ipfs
         [TestMethod]
         public void Register_Name_Already_Exists()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => NetworkProtocol.Register<NameExists>());
+            Assert.ThrowsException<ArgumentException>(() => NetworkProtocol.Register<NameExists>());
         }
 
         [TestMethod]
         public void Register_Code_Already_Exists()
         {
-            ExceptionAssert.Throws<ArgumentException>(() => NetworkProtocol.Register<CodeExists>());
+            Assert.ThrowsException<ArgumentException>(() => NetworkProtocol.Register<CodeExists>());
         }
 
         private class NameExists : NetworkProtocol

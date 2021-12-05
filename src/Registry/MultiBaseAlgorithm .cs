@@ -40,7 +40,7 @@
                 bytes => bytes.ToBase64Url(),
                 s => s.FromBase64Url());
             Register("base16", 'f',
-                bytes => SimpleBase.Base16.EncodeLower(bytes),
+                bytes => SimpleBase.Base16.LowerCase.Encode(bytes),
                 s => SimpleBase.Base16.Decode(s).ToArray());
             Register("base32", 'b',
                 bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false).ToLowerInvariant(),
@@ -55,7 +55,7 @@
                 bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true).ToLowerInvariant(),
                 s => SimpleBase.Base32.ExtendedHex.Decode(s).ToArray());
             Register("BASE16", 'F',
-                bytes => SimpleBase.Base16.EncodeUpper(bytes),
+                bytes => SimpleBase.Base16.UpperCase.Encode(bytes),
                 s => SimpleBase.Base16.Decode(s).ToArray());
             Register("BASE32", 'B',
                 bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false),

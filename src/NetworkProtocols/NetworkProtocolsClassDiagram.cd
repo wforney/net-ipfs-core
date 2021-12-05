@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ipfs.DccpNetworkProtocol">
+    <Position X="5.5" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\DccpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Dns4NetworkProtocol">
+    <Position X="5.75" Y="16.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\Dns4NetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Dns6NetworkProtocol">
+    <Position X="5.75" Y="18.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\Dns6NetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.DnsAddrNetworkProtocol">
+    <Position X="5.75" Y="20.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\DnsAddrNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.DnsNetworkProtocol">
+    <Position X="5.75" Y="22" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\DnsNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.DomainNameNetworkProtocol">
+    <Position X="3" Y="16.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\DomainNameNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.HttpNetworkProtocol">
+    <Position X="8.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\HttpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.HttpsNetworkProtocol">
+    <Position X="8.25" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\HttpsNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.IpcidrNetworkProtocol">
+    <Position X="3" Y="5.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAEAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\IpcidrNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.IpfsNetworkProtocol">
+    <Position X="5.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\IpfsNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.IpNetworkProtocol">
+    <Position X="3" Y="10.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQCAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\IpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Ipv4NetworkProtocol">
+    <Position X="5.5" Y="11.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAgAAQAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\Ipv4NetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Ipv6NetworkProtocol">
+    <Position X="5.5" Y="14" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAgAAQAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\Ipv6NetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Libp2pWebrtcDirectNetworkProtocol">
+    <Position X="10.75" Y="5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\Libp2pWebrtcDirectNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Libp2pWebrtcStarNetworkProtocol">
+    <Position X="10.75" Y="6.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\Libp2pWebrtcStarNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.NetworkProtocol">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAEAAAgAAUAAAABAAQAAAAgAQAAEAA=</HashCode>
+      <FileName>NetworkProtocols\NetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.OnionNetworkProtocol">
+    <Position X="3" Y="13.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQACAIAAAQCAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\OnionNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.P2pCircuitNetworkProtocol">
+    <Position X="10.75" Y="1.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\P2pCircuitNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.P2pNetworkProtocol">
+    <Position X="3" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAASAAAAAAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\P2pNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.QuicNetworkProtocol">
+    <Position X="8.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\QuicNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.SctpNetworkProtocol">
+    <Position X="5.5" Y="8" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\SctpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.TcpNetworkProtocol">
+    <Position X="3" Y="8" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQACAAAAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\TcpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.UdpNetworkProtocol">
+    <Position X="5.5" Y="9.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\UdpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.UdtNetworkProtocol">
+    <Position X="10.75" Y="3.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\UdtNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.UtpNetworkProtocol">
+    <Position X="8.25" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\UtpNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.ValuelessNetworkProtocol">
+    <Position X="5.5" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAQAAAAA=</HashCode>
+      <FileName>NetworkProtocols\ValuelessNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.WsNetworkProtocol">
+    <Position X="8.25" Y="4" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\WsNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.WssNetworkProtocol">
+    <Position X="8.25" Y="7.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NetworkProtocols\WssNetworkProtocol.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

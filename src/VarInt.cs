@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Ipfs
+﻿namespace Ipfs
 {
     /// <summary>
     ///   A codec for a variable integer.
@@ -41,11 +33,9 @@ namespace Ipfs
         /// </returns>
         public static byte[] Encode(long value)
         {
-            using (var stream = new MemoryStream(64))
-            {
-                stream.WriteVarint(value);
-                return stream.ToArray();
-            }
+            using var stream = new MemoryStream(64);
+            stream.WriteVarint(value);
+            return stream.ToArray();
         }
 
         /// <summary>
@@ -70,13 +60,11 @@ namespace Ipfs
         ///   Offset into <paramref name="bytes"/> to start reading from.
         /// </param>
         /// <returns>The integer value.</returns>
-        public static int DecodeInt32 (byte[] bytes, int offset = 0)
+        public static int DecodeInt32(byte[] bytes, int offset = 0)
         {
-            using (var stream = new MemoryStream(bytes, false))
-            {
-                stream.Position = offset;
-                return stream.ReadVarint32();
-            }
+            using var stream = new MemoryStream(bytes, false);
+            stream.Position = offset;
+            return stream.ReadVarint32();
         }
 
         /// <summary>
@@ -91,11 +79,9 @@ namespace Ipfs
         /// <returns>The integer value.</returns>
         public static long DecodeInt64(byte[] bytes, int offset = 0)
         {
-            using (var stream = new MemoryStream(bytes, false))
-            {
-                stream.Position = offset;
-                return stream.ReadVarint64();
-            }
+            using var stream = new MemoryStream(bytes, false);
+            stream.Position = offset;
+            return stream.ReadVarint64();
         }
 
         /// <summary>
@@ -117,7 +103,7 @@ namespace Ipfs
         }
 
         /// <summary>
-        ///   Reads a variable integer from the stream. 
+        ///   Reads a variable integer from the stream.
         /// </summary>
         /// <param name="stream">
         ///   A varint encoded <see cref="Stream"/>.
@@ -126,7 +112,7 @@ namespace Ipfs
         ///   When the no bytes exist in the <paramref name="stream"/>.
         /// </exception>
         /// <exception cref="InvalidDataException">
-        ///   When the varint value is greater than <see cref="Int32.MaxValue"/>.
+        ///   When the varint value is greater than <see cref="int.MaxValue"/>.
         /// </exception>
         /// <returns>The integer value.</returns>
         public static int ReadVarint32(this Stream stream)
@@ -135,7 +121,7 @@ namespace Ipfs
         }
 
         /// <summary>
-        ///   Reads a variable integer from the stream. 
+        ///   Reads a variable integer from the stream.
         /// </summary>
         /// <param name="stream">
         ///   A varint encoded <see cref="Stream"/>.
@@ -144,7 +130,7 @@ namespace Ipfs
         ///   When the no bytes exist in the <paramref name="stream"/>.
         /// </exception>
         /// <exception cref="InvalidDataException">
-        ///   When the varint value is greater than <see cref="Int64.MaxValue"/>.
+        ///   When the varint value is greater than <see cref="long.MaxValue"/>.
         /// </exception>
         /// <returns>The integer value.</returns>
         public static long ReadVarint64(this Stream stream)
@@ -171,10 +157,12 @@ namespace Ipfs
         /// <exception cref="NotSupportedException">
         ///   When <paramref name="value"/> is negative.
         /// </exception>
-        public static async Task WriteVarintAsync(this Stream stream, long value, CancellationToken cancel = default(CancellationToken))
+        public static async Task WriteVarintAsync(this Stream stream, long value, CancellationToken cancel = default)
         {
             if (value < 0)
+            {
                 throw new NotSupportedException("Negative values are not allowed for a Varint");
+            }
 
             var bytes = new byte[10];
             int i = 0;
@@ -182,15 +170,18 @@ namespace Ipfs
             {
                 byte v = (byte)(value & 0x7F);
                 if (value > 0x7F)
+                {
                     v |= 0x80;
+                }
+
                 bytes[i++] = v;
                 value >>= 7;
             } while (value != 0);
-            await stream.WriteAsync(bytes, 0, i, cancel).ConfigureAwait(false);
+            await stream.WriteAsync(bytes.AsMemory(0, i), cancel).ConfigureAwait(false);
         }
 
         /// <summary>
-        ///   Reads a variable integer from the stream. 
+        ///   Reads a variable integer from the stream.
         /// </summary>
         /// <param name="stream">
         ///   A varint encoded <see cref="Stream"/>.
@@ -206,18 +197,21 @@ namespace Ipfs
         ///   When the no bytes exist in the <paramref name="stream"/>.
         /// </exception>
         /// <exception cref="InvalidDataException">
-        ///   When the varint value is greater than <see cref="Int32.MaxValue"/>.
+        ///   When the varint value is greater than <see cref="int.MaxValue"/>.
         /// </exception>
-        public static async Task<int> ReadVarint32Async(this Stream stream, CancellationToken cancel = default(CancellationToken))
+        public static async Task<int> ReadVarint32Async(this Stream stream, CancellationToken cancel = default)
         {
             var value = await stream.ReadVarint64Async(cancel).ConfigureAwait(false);
             if (value > int.MaxValue)
+            {
                 throw new InvalidDataException("Varint value is bigger than an Int32.MaxValue");
+            }
+
             return (int)value;
         }
 
         /// <summary>
-        ///   Reads a variable integer from the stream. 
+        ///   Reads a variable integer from the stream.
         /// </summary>
         /// <param name="stream">
         ///   A varint encoded <see cref="Stream"/>.
@@ -226,7 +220,7 @@ namespace Ipfs
         ///   Is used to stop the task.  When cancelled, the <see cref="TaskCanceledException"/> is raised.
         /// </param>
         /// <exception cref="InvalidDataException">
-        ///   When the varint value is greater than <see cref="Int64.MaxValue"/>.
+        ///   When the varint value is greater than <see cref="long.MaxValue"/>.
         /// </exception>
         /// <exception cref="EndOfStreamException">
         ///   When the no bytes exist in the <paramref name="stream"/>.
@@ -235,7 +229,7 @@ namespace Ipfs
         ///   A task that represents the asynchronous operation. The task's result
         ///   is the integer value in the <paramref name="stream"/>.
         /// </returns>
-        public static async Task<long> ReadVarint64Async(this Stream stream, CancellationToken cancel = default(CancellationToken))
+        public static async Task<long> ReadVarint64Async(this Stream stream, CancellationToken cancel = default)
         {
             long value = 0;
             int shift = 0;
@@ -243,19 +237,27 @@ namespace Ipfs
             var buffer = new byte[1];
             while (true)
             {
-                if (1 != await stream.ReadAsync(buffer, 0, 1, cancel).ConfigureAwait(false))
+                if (1 != await stream.ReadAsync(buffer.AsMemory(0, 1), cancel).ConfigureAwait(false))
                 {
                     if (bytesRead == 0)
+                    {
                         throw new EndOfStreamException();
+                    }
 
                     throw new InvalidDataException("Varint is not terminated");
                 }
                 if (++bytesRead > 9)
+                {
                     throw new InvalidDataException("Varint value is bigger than an Int64.MaxValue");
+                }
+
                 var b = buffer[0];
                 value |= (long)(b & 0x7F) << shift;
                 if (b < 0x80)
+                {
                     return value;
+                }
+
                 shift += 7;
             }
         }

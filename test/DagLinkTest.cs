@@ -1,11 +1,5 @@
-﻿using Ipfs;
+﻿using Google.Protobuf;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Google.Protobuf;
 
 namespace Ipfs
 {
@@ -62,8 +56,8 @@ namespace Ipfs
         [TestMethod]
         public void Null_Stream()
         {
-            ExceptionAssert.Throws(() => new DagLink((CodedInputStream)null));
-            ExceptionAssert.Throws(() => new DagLink((Stream)null));
+            Assert.ThrowsException<ArgumentNullException>(() => new DagLink((CodedInputStream?)null));
+            Assert.ThrowsException<ArgumentNullException>(() => new DagLink((Stream?)null));
         }
 
         [TestMethod]

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ipfs
 {
@@ -49,7 +44,7 @@ namespace Ipfs
         [TestMethod]
         public void Parsing_MissingNumber()
         {
-            ExceptionAssert.Throws<FormatException>(() =>
+            Assert.ThrowsException<FormatException>(() =>
             {
                 var _ = Duration.Parse("s");
             });
@@ -58,7 +53,7 @@ namespace Ipfs
         [TestMethod]
         public void Parsing_MissingUnit()
         {
-            ExceptionAssert.Throws<FormatException>(() =>
+            Assert.ThrowsException<FormatException>(() =>
             {
                 var _ = Duration.Parse("1");
             }, "Missing IPFS duration unit.");
@@ -67,7 +62,7 @@ namespace Ipfs
         [TestMethod]
         public void Parsing_InvalidUnit()
         {
-            ExceptionAssert.Throws<FormatException>(() =>
+            Assert.ThrowsException<FormatException>(() =>
             {
                 var _ = Duration.Parse("1jiffy");
             }, "Unknown IPFS duration unit 'jiffy'.");

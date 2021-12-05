@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ipfs.Base32">
+    <Position X="0.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAACAAAAAQAAAAAA=</HashCode>
+      <FileName>Base32.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Base32z">
+    <Position X="2.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Base32z.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Base58">
+    <Position X="4" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAACAAAAQAQAAAAAA=</HashCode>
+      <FileName>Base58.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Base64NoPad">
+    <Position X="5.75" Y="9" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAEABAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Base64NoPad.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Base64Url">
+    <Position X="7.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAgAAAAAEAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Base64Url.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Cid" BaseTypeListCollapsed="true">
+    <Position X="7.25" Y="0.5" Width="2.75" />
+    <NestedTypes>
+      <Class Name="Ipfs.Cid.CidJsonConverter" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Cid.CidJsonConverter.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IAAAICAAAAJEACAGgAAAAAAggAAAAJAgAAAQQAFgAiA=</HashCode>
+      <FileName>Cid.CidJsonConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Ipfs.DagLink" BaseTypeListCollapsed="true">
+    <Position X="10.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAgAAAAAAAAAQgAAAAAAAAAAAAAAFAAAA=</HashCode>
+      <FileName>DagLink.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Ipfs.DagNode" BaseTypeListCollapsed="true">
+    <Position X="10.5" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AABiAAAAAAAAgAAcCIAAAAAgAAAAAEAACAAACgFQAgA=</HashCode>
+      <FileName>DagNode.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Ipfs.Duration">
+    <Position X="9.5" Y="9" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQwAAAAAAAAAAAAAAABAAABAAAAAEgAAAAAAAAAAAA=</HashCode>
+      <FileName>Duration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.HexString">
+    <Position X="0.5" Y="11" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAABAAAAAAAABAAAAAAAAAAAABAACUAAAAAA=</HashCode>
+      <FileName>HexString.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.MultiAddress" BaseTypeListCollapsed="true">
+    <Position X="13" Y="0.5" Width="2.25" />
+    <NestedTypes>
+      <Class Name="Ipfs.MultiAddress.Json" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MultiAddress.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAABAEgAAAAABgAAACAYAAAAAAAAFAEjA=</HashCode>
+      <FileName>MultiAddress.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Ipfs.MultiBase">
+    <Position X="2.5" Y="11" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAABAAAAAAAAAAAAAAAAAAAAAAAAAQEAAAAA=</HashCode>
+      <FileName>MultiBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.MultiCodec">
+    <Position X="4.75" Y="11" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MultiCodec.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.MultiHash" BaseTypeListCollapsed="true">
+    <Position X="15.75" Y="0.5" Width="2.5" />
+    <NestedTypes>
+      <Class Name="Ipfs.MultiHash.Json" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MultiHash.Json.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABAAAABAAABhAAAEkAAQCAAgAAECAIABAgQACAVAAiA=</HashCode>
+      <FileName>MultiHash.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Ipfs.NamedContent">
+    <Position X="5.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>NamedContent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Peer" BaseTypeListCollapsed="true">
+    <Position X="13" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IABCEAgAAAAAIAAEgAgAAAQAAAEAAIAAAAACAgAAAiA=</HashCode>
+      <FileName>Peer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Ipfs.ProtobufHelper">
+    <Position X="7.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BACAAAAAAAAEAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ProtobufHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.UnknownHashingAlgorithmEventArgs">
+    <Position X="7.25" Y="7.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>UnknownHashingAlgorithmEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ipfs.Varint">
+    <Position X="9.25" Y="11.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAQAAABAAAAAQAAAAAAAAAIAgAAAAABAAAACEAQ=</HashCode>
+      <FileName>VarInt.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Ipfs.IDataBlock">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAgAAACAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>IDataBlock.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.IFileSystemLink">
+    <Position X="2.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IFileSystemLink.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.IFileSystemNode">
+    <Position X="4.75" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IFileSystemNode.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.IKey">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IKey.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.ILinkedNode">
+    <Position X="4.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ILinkedNode.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.IMerkleLink">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IMerkleLink.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.IMerkleNode&lt;Link&gt;">
+    <Position X="2.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAQAAA=</HashCode>
+      <FileName>IMerkleNode.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ipfs.IPublishedMessage">
+    <Position X="2.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAACAIAAA=</HashCode>
+      <FileName>IPublishedMessage.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

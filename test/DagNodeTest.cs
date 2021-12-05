@@ -1,11 +1,6 @@
-﻿using Ipfs;
+﻿using Google.Protobuf;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.IO;
-using Google.Protobuf;
 
 namespace Ipfs
 {
@@ -15,7 +10,7 @@ namespace Ipfs
         [TestMethod]
         public void EmptyDAG()
         {
-            var node = new DagNode((byte[]) null);
+            var node = new DagNode((byte[]?)null);
             Assert.AreEqual(0, node.DataBytes.Length);
             Assert.AreEqual(0, node.Links.Count());
             Assert.AreEqual(0, node.Size);
@@ -190,8 +185,8 @@ namespace Ipfs
         [TestMethod]
         public void Null_Stream()
         {
-            ExceptionAssert.Throws(() => new DagNode((CodedInputStream)null));
-            ExceptionAssert.Throws(() => new DagNode((Stream)null));
+            Assert.ThrowsException<ArgumentNullException>(() => new DagNode((CodedInputStream?)null));
+            Assert.ThrowsException<ArgumentNullException>(() => new DagNode((Stream?)null));
         }
 
         [TestMethod]
@@ -207,6 +202,7 @@ namespace Ipfs
             Assert.AreEqual("hello", link.Name);
             Assert.AreEqual(1, link.Id.Version);
             Assert.AreEqual("raw", link.Id.ContentType);
+            Assert.IsNotNull(link.Id.Hash.Algorithm);
             Assert.AreEqual("sha2-512", link.Id.Hash.Algorithm.Name);
             Assert.AreEqual(11, link.Size);
         }
@@ -214,8 +210,8 @@ namespace Ipfs
         [TestMethod]
         public void Setting_Id()
         {
-            var a = new DagNode((byte[])null);
-            var b = new DagNode((byte[])null)
+            var a = new DagNode((byte[]?)null);
+            var b = new DagNode((byte[]?)null)
             {
                 // Wrong hash but allowed.
                 Id = "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1m"
@@ -237,22 +233,20 @@ namespace Ipfs
             CollectionAssert.AreEqual(a.DataBytes, b.DataBytes);
             CollectionAssert.AreEqual(a.ToArray(), b.ToArray());
             Assert.AreEqual(a.Links.Count(), b.Links.Count());
-            a.Links.Zip(b.Links, (first, second) =>
-            {
-                Assert.AreEqual(first.Id, second.Id);
-                Assert.AreEqual(first.Name, second.Name);
-                Assert.AreEqual(first.Size, second.Size);
-                return first;
-            }).ToArray();
+            _ = a.Links.Zip(b.Links, (first, second) =>
+              {
+                  Assert.AreEqual(first.Id, second.Id);
+                  Assert.AreEqual(first.Name, second.Name);
+                  Assert.AreEqual(first.Size, second.Size);
+                  return first;
+              }).ToArray();
 
-            using (var first = a.DataStream)
-            using (var second = b.DataStream)
+            using var first = a.DataStream;
+            using var second = b.DataStream;
+            Assert.AreEqual(first.Length, second.Length);
+            for (int i = 0; i < first.Length; ++i)
             {
-                Assert.AreEqual(first.Length, second.Length);
-                for (int i = 0; i < first.Length; ++i)
-                {
-                    Assert.AreEqual(first.ReadByte(), second.ReadByte());
-                }
+                Assert.AreEqual(first.ReadByte(), second.ReadByte());
             }
         }
     }
