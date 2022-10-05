@@ -40,7 +40,7 @@
 		<PackageReference Include="Common.Logging" Version="3.4.1" />
 		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
 		<PackageReference Include="Google.Protobuf" Version="3.21.1" />
-		<PackageReference Include="Grpc.Tools" Version="2.46.3" PrivateAssets="All" />
+		<PackageReference Include="Grpc.Tools" Version="2.49.1" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.3.44" PrivateAssets="All" />
 		<PackageReference Include="murmurhash" Version="1.0.3" />
