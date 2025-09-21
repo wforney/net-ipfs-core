@@ -1,20 +1,18 @@
-using System.Collections.Generic;
-
 namespace Ipfs.CoreApi;
 
 /// <summary>
-///   Options for pin add.
+/// Options for pin add.
 /// </summary>
 public record PinAddOptions
 {
     /// <summary>
-    ///   Optional name for created pin(s).
+    /// Optional name for created pin(s).
     /// </summary>
     public string? Name { get; set; }
 
     /// <summary>
-    ///   True to recursively pin links of the object; otherwise, false to only pin the specified object.
-    ///   Default is true.
+    /// True to recursively pin links of the object; otherwise, false to only pin the specified
+    /// object. Default is true.
     /// </summary>
     public bool Recursive { get; set; } = true;
 }

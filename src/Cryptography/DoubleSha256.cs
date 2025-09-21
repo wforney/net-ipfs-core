@@ -1,34 +1,29 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
-namespace Ipfs.Cryptography
+namespace Ipfs.Cryptography;
+
+internal class DoubleSha256 : HashAlgorithm
 {
-    internal class DoubleSha256 : HashAlgorithm
+    private readonly HashAlgorithm _digest = SHA256.Create();
+    private byte[]? _round1;
+
+    public override int HashSize => _digest.HashSize;
+
+    public override void Initialize() => _digest.Initialize();
+
+    protected override void HashCore(byte[] array, int ibStart, int cbSize)
     {
-        private readonly HashAlgorithm _digest = SHA256.Create();
-        private byte[]? _round1;
-
-        public override void Initialize()
+        if (_round1 is not null)
         {
-            _digest.Initialize();
+            throw new NotSupportedException("Already called.");
         }
 
-        public override int HashSize => _digest.HashSize;
+        _round1 = _digest.ComputeHash(array, ibStart, cbSize);
+    }
 
-        protected override void HashCore(byte[] array, int ibStart, int cbSize)
-        {
-            if (_round1 is not null)
-            {
-                throw new NotSupportedException("Already called.");
-            }
-
-            _round1 = _digest.ComputeHash(array, ibStart, cbSize);
-        }
-
-        protected override byte[] HashFinal()
-        {
-            _digest.Initialize();
-            return _digest.ComputeHash(_round1);
-        }
+    protected override byte[] HashFinal()
+    {
+        _digest.Initialize();
+        return _digest.ComputeHash(_round1!);
     }
 }
