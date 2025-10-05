@@ -14,14 +14,14 @@ namespace Ipfs;
 public static class HexString
 {
     private static readonly string[] LowerCaseHexStrings =
-        [.. Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(v => v.ToString("x2"))];
+        [.. Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(v => v.ToString("x2", System.Globalization.CultureInfo.InvariantCulture))];
     private static readonly string[] UpperCaseHexStrings =
-        [.. Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(v => v.ToString("X2"))];
+        [.. Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(v => v.ToString("X2", System.Globalization.CultureInfo.InvariantCulture))];
     private static readonly Dictionary<string, byte> HexBytes =
         Enumerable.Range(byte.MinValue, byte.MaxValue + 1)
         .SelectMany(v => new[] {
-            new { Value = v, String = v.ToString("x2") },
-            new { Value = v, String = v.ToString("X2") }
+            new { Value = v, String = v.ToString("x2", System.Globalization.CultureInfo.InvariantCulture) },
+            new { Value = v, String = v.ToString("X2", System.Globalization.CultureInfo.InvariantCulture) }
         })
         .Distinct()
         .ToDictionary(v => v.String, v => (byte)v.Value);
@@ -42,11 +42,16 @@ public static class HexString
     /// </returns>
     public static string Encode(byte[] buffer, string format = "G")
     {
+        if (buffer is null)
+        {
+            throw new ArgumentNullException(nameof(buffer));
+        }
+
         string[] hexStrings = format switch
         {
             "G" or "x" => LowerCaseHexStrings,
             "X" => UpperCaseHexStrings,
-            _ => throw new FormatException(string.Format("Invalid HexString format '{0}', only 'G', 'x' or 'X' are allowed.", format)),
+            _ => throw new FormatException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Invalid HexString format '{0}', only 'G', 'x' or 'X' are allowed.", format)),
         };
         var s = new StringBuilder(buffer.Length * 2);
         foreach (byte v in buffer)
@@ -84,6 +89,11 @@ public static class HexString
     /// </returns>
     public static byte[] Decode(string s)
     {
+        if (s is null)
+        {
+            throw new ArgumentNullException(nameof(s));
+        }
+
         int n = s.Length;
         if (n % 2 != 0)
         {
@@ -96,7 +106,7 @@ public static class HexString
             string hex = s.Substring(i, 2);
             if (!HexBytes.TryGetValue(hex, out byte value))
             {
-                throw new InvalidDataException(string.Format("'{0}' is not a valid hexadecimal byte.", hex));
+                throw new InvalidDataException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "'{0}' is not a valid hexadecimal byte.", hex));
             }
 
             buffer[j] = value;
