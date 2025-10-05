@@ -136,7 +136,7 @@ public class MultiAddress : IEquatable<MultiAddress>
             NetworkProtocol? protocol = Protocols
                 .LastOrDefault(p => p.Name is "ipfs" or "p2p");
             return protocol?.Value is null
-                ? throw new Exception($"'{this}' is missing the peer ID. Add the 'ipfs' or 'p2p' protocol.")
+                ? throw new InvalidOperationException($"'{this}' is missing the peer ID. Add the 'ipfs' or 'p2p' protocol.")
                 : (MultiHash)protocol.Value;
         }
     }
@@ -144,7 +144,7 @@ public class MultiAddress : IEquatable<MultiAddress>
     /// <summary>
     /// The components of the <b>MultiAddress</b>.
     /// </summary>
-    public List<NetworkProtocol> Protocols { get; private set; }
+    public System.Collections.ObjectModel.Collection<NetworkProtocol> Protocols { get; private set; }
 
     /// <summary>
     /// Implicit casting of a <see cref="string"/> to a <see cref="MultiAddress"/>.
@@ -235,11 +235,21 @@ public class MultiAddress : IEquatable<MultiAddress>
     public override int GetHashCode()
     {
         int code = 0;
-
         foreach (NetworkProtocol p in Protocols)
         {
             code += p.Code.GetHashCode();
-            code += p.Value?.GetHashCode() ?? 0;
+            if (p.Value is string s)
+            {
+                code += s.GetHashCode(System.StringComparison.Ordinal);
+            }
+            else
+            {
+#if NETSTANDARD2_1_OR_GREATER
+                code += p.Value?.GetHashCode(StringComparison.Ordinal) ?? 0;
+#else
+                code += p.Value?.GetHashCode() ?? 0;
+#endif
+            }
         }
         return code;
     }
@@ -290,7 +300,13 @@ public class MultiAddress : IEquatable<MultiAddress>
             return this;
         }
         MultiAddress clone = Clone();
-        _ = clone.Protocols.RemoveAll(p => p.Name is "p2p" or "ipfs");
+        for (int i = clone.Protocols.Count - 1; i >= 0; i--)
+        {
+            if (clone.Protocols[i].Name is "p2p" or "ipfs")
+            {
+                clone.Protocols.RemoveAt(i);
+            }
+        }
         return clone;
     }
 
@@ -308,7 +324,7 @@ public class MultiAddress : IEquatable<MultiAddress>
         if (HasPeerId)
         {
             MultiHash id = PeerId;
-            return id != peerId ? throw new Exception($"Expected a multiaddress with peer ID of '{peerId}', not '{id}'.") : this;
+            return id != peerId ? throw new InvalidOperationException($"Expected a multiaddress with peer ID of '{peerId}', not '{id}'.") : this;
         }
 
         return new MultiAddress(ToString() + $"/p2p/{peerId}");
@@ -404,7 +420,7 @@ public class MultiAddress : IEquatable<MultiAddress>
             uint code = (uint)stream.ReadInt64();
             if (!NetworkProtocol.Codes.TryGetValue(code, out Type? protocolType))
             {
-                throw new InvalidDataException(string.Format("The IPFS network protocol code '{0}' is unknown.", code));
+                throw new InvalidDataException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "The IPFS network protocol code '{0}' is unknown.", code));
             }
 
             NetworkProtocol p = (NetworkProtocol?)Activator.CreateInstance(protocolType)
@@ -468,6 +484,11 @@ public class MultiAddress : IEquatable<MultiAddress>
     /// <remarks>The JSON is just a single string value.</remarks>
     private sealed class Json : JsonConverter
     {
+        /// <summary>
+        /// A singleton instance of the <see cref="Json"/> converter.
+        /// </summary>
+        public static readonly Json Instance = new();
+
         /// <inheritdoc/>
         public override bool CanRead => true;
 
