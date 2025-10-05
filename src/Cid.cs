@@ -5,97 +5,55 @@ using Newtonsoft.Json;
 namespace Ipfs;
 
 /// <summary>
-///  Identifies some content, e.g. a Content ID.
+/// Identifies some content, e.g. a Content ID.
 /// </summary>
 /// <remarks>
-///   <para>
-///   A Cid is a self-describing content-addressed identifier for distributed systems.
-///   </para>
-///   <para>
-///   Initially, IPFS used a <see cref="MultiHash"/> as the CID and this is still supported as <see cref="Version"/> 0.
-///   Version 1 adds a self describing structure to the multi-hash, see the <see href="https://github.com/ipld/cid">spec</see>.
-///   </para>
-///   <note>
-///   The <see cref="MultiHash.Algorithm">hashing algorithm</see> must be "sha2-256" for a version 0 CID.
-///   </note>
+/// <para>A Cid is a self-describing content-addressed identifier for distributed systems.</para>
+/// <para>
+/// Initially, IPFS used a <see cref="MultiHash"/> as the CID and this is still supported as <see
+/// cref="Version"/> 0. Version 1 adds a self describing structure to the multi-hash, see the <see href="https://github.com/ipld/cid">spec</see>.
+/// </para>
+/// <note> The <see cref="MultiHash.Algorithm">hashing algorithm</see> must be "sha2-256" for a
+/// version 0 CID. </note>
 /// </remarks>
 /// <seealso href="https://github.com/ipld/cid"/>
 [JsonConverter(typeof(CidJsonConverter))]
 public class Cid : IEquatable<Cid>
 {
     /// <summary>
-    ///   The default <see cref="ContentType"/>.
+    /// The default <see cref="ContentType"/>.
     /// </summary>
     public const string DefaultContentType = "dag-pb";
 
     private string? _encodedValue;
+
     private string _encoding = MultiBase.DefaultAlgorithmName;
 
     /// <summary>
-    ///   Throws if a property cannot be set.
+    /// The content type or format of the data being addressed.
     /// </summary>
-    /// <exception cref="NotSupportedException">
-    ///   When a property cannot be set.
-    /// </exception>
-    /// <remarks>
-    ///   Once <see cref="Encode"/> is invoked, the CID's properties
-    ///   cannot be set.
-    /// </remarks>
-    private void EnsureMutable()
-    {
-        if (_encodedValue is not null)
-        {
-            throw new NotSupportedException("CID cannot be changed.");
-        }
-    }
-
-    /// <summary>
-    ///   The version of the CID.
-    /// </summary>
-    /// <value>
-    ///   0 or 1.
-    /// </value>
-    /// <remarks>
-    ///   <para>
-    ///   When the <see cref="Version"/> is 0 and the following properties
-    ///   are not matched, then the version is upgraded to version 1 when any
-    ///   of the properties is set.
-    ///   <list type="bullet">
-    ///   <item><description><see cref="ContentType"/> equals "dag-pb"</description></item>
-    ///   <item><description><see cref="Encoding"/> equals "base58btc"</description></item>
-    ///   <item><description><see cref="Hash"/> algorithm name equals "sha2-256"</description></item>
-    ///   </list>
-    ///   </para>
-    ///   <para>
-    ///   </para>
-    ///   The default <see cref="Encoding"/> is "base32" when the
-    ///   <see cref="Version"/> is not zero.
-    /// </remarks>
-    public int Version
+    /// <value>dag-pb, dag-cbor, eth-block, etc. Defaults to "dag-pb".</value>
+    /// <remarks>Sets <see cref="Version"/> to 1, when setting a value that is not equal to "dag-pb".</remarks>
+    /// <seealso cref="MultiCodec"/>
+    public string ContentType
     {
         get;
         set
         {
             EnsureMutable();
-            if (field == 0 && value > 0 && Encoding == "base58btc")
-            {
-                _encoding = "base32";
-            }
-
             field = value;
+            if (Version == 0 && value != "dag-pb")
+            {
+                Version = 1;
+            }
         }
-    }
+    } = DefaultContentType;
 
     /// <summary>
-    ///   The <see cref="MultiBase"/> encoding of the CID.
+    /// The <see cref="MultiBase"/> encoding of the CID.
     /// </summary>
-    /// <value>
-    ///   base58btc, base32, base64, etc.  Defaults to <see cref="MultiBase.DefaultAlgorithmName"/>.
-    /// </value>
-    /// <remarks>
-    ///    Sets <see cref="Version"/> to 1, when setting a value that
-    ///    is not equal to "base58btc".
-    /// </remarks>
+    /// <value>base58btc, base32, base64, etc. Defaults to <see cref="MultiBase.DefaultAlgorithmName"/>.</value>
+    /// <remarks>Sets <see cref="Version"/> to 1, when setting a value that is not equal to "base58btc".</remarks>
     /// <seealso cref="MultiBase"/>
     public string Encoding
     {
@@ -113,44 +71,14 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   The content type or format of the data being addressed.
+    /// The cryptographic hash of the content being addressed.
     /// </summary>
-    /// <value>
-    ///   dag-pb, dag-cbor, eth-block, etc.  Defaults to "dag-pb".
-    /// </value>
+    /// <value>The <see cref="MultiHash"/> of the content being addressed.</value>
     /// <remarks>
-    ///    Sets <see cref="Version"/> to 1, when setting a value that
-    ///    is not equal to "dag-pb".
-    /// </remarks>
-    /// <seealso cref="MultiCodec"/>
-    public string ContentType
-    {
-        get;
-        set
-        {
-            EnsureMutable();
-            field = value;
-            if (Version == 0 && value != "dag-pb")
-            {
-                Version = 1;
-            }
-        }
-    } = DefaultContentType;
-
-    /// <summary>
-    ///   The cryptographic hash of the content being addressed.
-    /// </summary>
-    /// <value>
-    ///   The <see cref="MultiHash"/> of the content being addressed.
-    /// </value>
-    /// <remarks>
-    ///   Sets <see cref="Version"/> to 1, when setting a hashing algorithm that
-    ///   is not equal to "sha2-256".
-    ///   <note>
-    ///   If the <see cref="MultiHash.Algorithm"/> equals <c>identity</c>, then
-    ///   the <see cref="MultiHash.Digest"/> is also the content.  This is commonly
-    ///   referred to as 'CID inlining'.
-    ///   </note>
+    /// Sets <see cref="Version"/> to 1, when setting a hashing algorithm that is not equal to
+    /// "sha2-256". <note> If the <see cref="MultiHash.Algorithm"/> equals <c>identity</c>, then the
+    /// <see cref="MultiHash.Digest"/> is also the content. This is commonly referred to as 'CID
+    /// inlining'. </note>
     /// </remarks>
     public MultiHash Hash
     {
@@ -167,129 +95,62 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   Returns the string representation of the CID in the
-    ///   general format.
+    /// The version of the CID.
     /// </summary>
-    /// <returns>
-    ///  e.g. "QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V"
-    /// </returns>
-    public override string ToString() => ToString("G");
-
-    /// <summary>
-    ///   Returns a string representation of the CID
-    ///   according to the provided format specifier.
-    /// </summary>
-    /// <param name="format">
-    ///   A single format specifier that indicates how to format the value of the
-    ///   CID.  Can be "G" or "L".
-    /// </param>
-    /// <returns>
-    ///   The CID in the specified <paramref name="format"/>.
-    /// </returns>
-    /// <exception cref="FormatException">
-    ///   <paramref name="format"/> is not valid.
-    /// </exception>
+    /// <value>0 or 1.</value>
     /// <remarks>
     /// <para>
-    ///   The "G" format specifier is the same as calling <see cref="Encode"/>.
-    /// </para>
-    /// <list type="table">
-    /// <listheader>
-    ///   <term>Specifier</term>
-    ///   <description>return value</description>
-    /// </listheader>
-    ///  <item>
-    ///    <term>G</term>
-    ///    <description>QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V</description>
-    ///  </item>
-    ///  <item>
-    ///    <term>L</term>
-    ///    <description>base58btc cidv0 dag-pb sha2-256 Qm...</description>
-    ///  </item>
+    /// When the <see cref="Version"/> is 0 and the following properties are not matched, then the
+    /// version is upgraded to version 1 when any of the properties is set.
+    /// <list type="bullet">
+    /// <item>
+    /// <description><see cref="ContentType"/> equals "dag-pb"</description>
+    /// </item>
+    /// <item>
+    /// <description><see cref="Encoding"/> equals "base58btc"</description>
+    /// </item>
+    /// <item>
+    /// <description><see cref="Hash"/> algorithm name equals "sha2-256"</description>
+    /// </item>
     /// </list>
+    /// </para>
+    /// <para></para>
+    /// The default <see cref="Encoding"/> is "base32" when the <see cref="Version"/> is not zero.
     /// </remarks>
-    public string ToString(string format)
+    public int Version
     {
-        switch (format)
+        get;
+        set
         {
-            case "G":
-                return Encode();
+            EnsureMutable();
+            if (field == 0 && value > 0 && Encoding == "base58btc")
+            {
+                _encoding = "base32";
+            }
 
-            case "L":
-                var sb = new StringBuilder();
-                _ = sb.Append(Encoding);
-                _ = sb.Append(' ');
-                _ = sb.Append("cidv");
-                _ = sb.Append(Version);
-                _ = sb.Append(' ');
-                _ = sb.Append(ContentType);
-                _ = sb.Append(' ');
-                _ = sb.Append(Hash.Algorithm.Name);
-                _ = sb.Append(' ');
-                _ = sb.Append(MultiBase.Encode(Hash.ToArray(), Encoding)[1..]);
-                return sb.ToString();
-
-            default:
-                throw new FormatException($"Invalid CID format specifier '{format}'.");
+            field = value;
         }
-
     }
 
     /// <summary>
-    ///   Converts the CID to its equivalent string representation.
+    /// Converts the specified <see cref="string"/> to an equivalent <see cref="Cid"/> object.
     /// </summary>
-    /// <returns>
-    ///   The string representation of the <see cref="Cid"/>.
-    /// </returns>
-    /// <remarks>
-    ///   For <see cref="Version"/> 0, this is equivalent to the
-    ///   <see cref="MultiHash.ToBase58()">base58btc encoding</see>
-    ///   of the <see cref="Hash"/>.
-    /// </remarks>
-    /// <seealso cref="Decode"/>
-    public string Encode()
-    {
-        if (_encodedValue is not null)
-        {
-            return _encodedValue;
-        }
-        if (Version == 0)
-        {
-            _encodedValue = Hash.ToBase58();
-        }
-        else
-        {
-            using var ms = new MemoryStream();
-            ms.WriteVarint(Version);
-            ms.WriteMultiCodec(ContentType);
-            Hash.Write(ms);
-            _encodedValue = MultiBase.Encode(ms.ToArray(), Encoding);
-        }
-        return _encodedValue;
-    }
-
-    /// <summary>
-    ///   Converts the specified <see cref="string"/>
-    ///   to an equivalent <see cref="Cid"/> object.
-    /// </summary>
-    /// <param name="input">
-    ///   The <see cref="Cid.Encode">CID encoded</see> string.
-    /// </param>
-    /// <returns>
-    ///   A new <see cref="Cid"/> that is equivalent to <paramref name="input"/>.
-    /// </returns>
-    /// <exception cref="FormatException">
-    ///   When the <paramref name="input"/> can not be decoded.
-    /// </exception>
+    /// <param name="input">The <see cref="Cid.Encode">CID encoded</see> string.</param>
+    /// <returns>A new <see cref="Cid"/> that is equivalent to <paramref name="input"/>.</returns>
+    /// <exception cref="FormatException">When the <paramref name="input"/> can not be decoded.</exception>
     /// <seealso cref="Encode"/>
     public static Cid Decode(string input)
     {
         try
         {
+#if NET8_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(input);
+#else
             if (input is null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
+#endif
 
             // SHA2-256 MultiHash is CID v0.
             if (input.Length == 46 && input.StartsWith("Qm", StringComparison.Ordinal))
@@ -316,14 +177,77 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   Reads the binary representation of the CID from the specified <see cref="Stream"/>.
+    /// Alternate method for implicit operator: create a Cid from a MultiHash.
     /// </summary>
-    /// <param name="stream">
-    ///   The <see cref="Stream"/> to read from.
-    /// </param>
+    public static Cid FromMultiHash(MultiHash hash) => (Cid)hash;
+
+    /// <summary>
+    /// Alternate method for implicit operator: create a Cid from a string.
+    /// </summary>
+    public static Cid FromString(string s) => Cid.Decode(s);
+
+    /// <summary>
+    /// Implicit casting of a <see cref="MultiHash"/> to a <see cref="Cid"/>.
+    /// </summary>
+    /// <param name="hash">A <see cref="MultiHash"/>.</param>
     /// <returns>
-    ///   A new <see cref="Cid"/>.
+    /// A new <see cref="Cid"/> based on the <paramref name="hash"/>. A <see cref="Version"/> 0 CID
+    /// is returned if the <paramref name="hash"/> is "sha2-356"; otherwise <see cref="Version"/> 1.
     /// </returns>
+    public static implicit operator Cid(MultiHash hash)
+    {
+        return hash?.Algorithm.Name == "sha2-256"
+            ? new Cid
+            {
+                Hash = hash,
+                Version = 0,
+                Encoding = "base58btc",
+                ContentType = "dag-pb"
+            }
+            : new Cid
+            {
+                Version = 1,
+                Hash = hash!
+            };
+    }
+
+    /// <summary>
+    /// Implicit casting of a <see cref="string"/> to a <see cref="Cid"/>.
+    /// </summary>
+    /// <param name="s">A string encoded <b>Cid</b>.</param>
+    /// <returns>A new <see cref="Cid"/>.</returns>
+    /// <remarks>
+    /// Equivalent to
+    /// <code> Cid.Decode(s)</code>
+    /// </remarks>
+    public static implicit operator Cid(string s) => Cid.Decode(s);
+
+    /// <summary>
+    /// Implicit casting of a <see cref="Cid"/> to a <see cref="string"/>.
+    /// </summary>
+    /// <param name="id">A <b>Cid</b>.</param>
+    /// <returns>A new <see cref="string"/>.</returns>
+    /// <remarks>
+    /// Equivalent to
+    /// <code>Cid.Encode()</code>
+    /// </remarks>
+    public static implicit operator string(Cid id) => id?.Encode() ?? string.Empty;
+
+    /// <summary>
+    /// Value inequality.
+    /// </summary>
+    public static bool operator !=(Cid? a, Cid? b) => !(a == b);
+
+    /// <summary>
+    /// Value equality.
+    /// </summary>
+    public static bool operator ==(Cid? a, Cid? b) => ReferenceEquals(a, b) || (a is not null && b is not null && a.Equals(b));
+
+    /// <summary>
+    /// Reads the binary representation of the CID from the specified <see cref="Stream"/>.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to read from.</param>
+    /// <returns>A new <see cref="Cid"/>.</returns>
     public static Cid Read(Stream stream)
     {
         var cid = new Cid();
@@ -343,41 +267,20 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   Writes the binary representation of the CID to the specified <see cref="Stream"/>.
+    /// Reads the binary representation of the CID from the specified <see cref="CodedInputStream"/>.
     /// </summary>
-    /// <param name="stream">
-    ///   The <see cref="Stream"/> to write to.
-    /// </param>
-    public void Write(Stream stream)
-    {
-        using var ms = new MemoryStream();
-        if (Version != 0)
-        {
-            ms.WriteVarint(Version);
-            ms.WriteMultiCodec(ContentType);
-        }
-        Hash.Write(ms);
-
-        stream.WriteVarint(ms.Length);
-        ms.Position = 0;
-        ms.CopyTo(stream);
-    }
-
-    /// <summary>
-    ///   Reads the binary representation of the CID from the specified <see cref="CodedInputStream"/>.
-    /// </summary>
-    /// <param name="stream">
-    ///   The <see cref="CodedInputStream"/> to read from.
-    /// </param>
-    /// <returns>
-    ///   A new <see cref="Cid"/>.
-    /// </returns>
+    /// <param name="stream">The <see cref="CodedInputStream"/> to read from.</param>
+    /// <returns>A new <see cref="Cid"/>.</returns>
     public static Cid Read(CodedInputStream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         var cid = new Cid();
         int length = stream.ReadLength();
@@ -397,59 +300,31 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   Writes the binary representation of the CID to the specified <see cref="CodedOutputStream"/>.
+    /// Reads the binary representation of the CID from the specified byte array.
     /// </summary>
-    /// <param name="stream">
-    ///   The <see cref="CodedOutputStream"/> to write to.
-    /// </param>
-    public void Write(CodedOutputStream stream)
-    {
-        if (stream is null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
-
-        using var ms = new MemoryStream();
-        if (Version != 0)
-        {
-            ms.WriteVarint(Version);
-            ms.WriteMultiCodec(ContentType);
-        }
-        Hash.Write(ms);
-
-        byte[] bytes = ms.ToArray();
-        stream.WriteLength(bytes.Length);
-        stream.WriteSomeBytes(bytes);
-    }
-
-    /// <summary>
-    ///   Reads the binary representation of the CID from the specified byte array.
-    /// </summary>
-    /// <param name="buffer">
-    ///   The souce of a CID.
-    /// </param>
-    /// <returns>
-    ///   A new <see cref="Cid"/>.
-    /// </returns>
-    /// <remarks>
-    ///   The buffer does NOT start with a varint length prefix.
-    /// </remarks>
+    /// <param name="buffer">The souce of a CID.</param>
+    /// <returns>A new <see cref="Cid"/>.</returns>
+    /// <remarks>The buffer does NOT start with a varint length prefix.</remarks>
     public static Cid Read(byte[] buffer)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(buffer);
+#else
         if (buffer is null)
         {
             throw new ArgumentNullException(nameof(buffer));
         }
+#endif
 
         var cid = new Cid();
-        if (buffer?.Length == 34)
+        if (buffer.Length == 34)
         {
             cid.Version = 0;
             cid.Hash = new MultiHash(buffer);
             return cid;
         }
 
-        using var ms = new MemoryStream(buffer!, false);
+        using var ms = new MemoryStream(buffer, false);
         cid.Version = ms.ReadVarint32();
         cid.ContentType = ms.ReadMultiCodec().Name;
         cid.Hash = new MultiHash(ms);
@@ -457,14 +332,55 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   Returns the binary representation of the CID as a byte array.
+    /// Converts the CID to its equivalent string representation.
     /// </summary>
-    /// <returns>
-    ///   A new buffer containing the CID.
-    /// </returns>
+    /// <returns>The string representation of the <see cref="Cid"/>.</returns>
     /// <remarks>
-    ///   The buffer does NOT start with a varint length prefix.
+    /// For <see cref="Version"/> 0, this is equivalent to the <see
+    /// cref="MultiHash.ToBase58()">base58btc encoding</see> of the <see cref="Hash"/>.
     /// </remarks>
+    /// <seealso cref="Decode"/>
+    public string Encode()
+    {
+        if (_encodedValue is not null)
+        {
+            return _encodedValue;
+        }
+
+        if (Version == 0)
+        {
+            _encodedValue = Hash.ToBase58();
+        }
+        else
+        {
+            using var ms = new MemoryStream();
+            ms.WriteVarint(Version);
+            ms.WriteMultiCodec(ContentType);
+            Hash.Write(ms);
+            _encodedValue = MultiBase.Encode(ms.ToArray(), Encoding);
+        }
+
+        return _encodedValue;
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => (obj is Cid that) && Encode() == that.Encode();
+
+    /// <inheritdoc/>
+    public bool Equals(Cid? that) => Encode() == that?.Encode();
+
+    /// <inheritdoc/>
+#if NET8_0_OR_GREATER
+    public override int GetHashCode() => Encode().GetHashCode(StringComparison.Ordinal);
+#else
+    public override int GetHashCode() => Encode().GetHashCode();
+#endif
+
+    /// <summary>
+    /// Returns the binary representation of the CID as a byte array.
+    /// </summary>
+    /// <returns>A new buffer containing the CID.</returns>
+    /// <remarks>The buffer does NOT start with a varint length prefix.</remarks>
     public byte[] ToArray()
     {
         if (Version == 0)
@@ -480,109 +396,159 @@ public class Cid : IEquatable<Cid>
     }
 
     /// <summary>
-    ///   Implicit casting of a <see cref="MultiHash"/> to a <see cref="Cid"/>.
+    /// Returns the string representation of the CID in the general format.
     /// </summary>
-    /// <param name="hash">
-    ///   A <see cref="MultiHash"/>.
+    /// <returns>e.g. "QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V"</returns>
+    public override string ToString() => ToString("G");
+
+    /// <summary>
+    /// Returns a string representation of the CID according to the provided format specifier.
+    /// </summary>
+    /// <param name="format">
+    /// A single format specifier that indicates how to format the value of the CID. Can be "G" or "L".
     /// </param>
-    /// <returns>
-    ///   A new <see cref="Cid"/> based on the <paramref name="hash"/>.  A <see cref="Version"/> 0
-    ///   CID is returned if the <paramref name="hash"/> is "sha2-356"; otherwise <see cref="Version"/> 1.
-    /// </returns>
-    public static implicit operator Cid(MultiHash hash)
+    /// <returns>The CID in the specified <paramref name="format"/>.</returns>
+    /// <exception cref="FormatException"><paramref name="format"/> is not valid.</exception>
+    /// <remarks>
+    /// <para>The "G" format specifier is the same as calling <see cref="Encode"/>.</para>
+    /// <list type="table">
+    /// <listheader>
+    /// <term>Specifier</term>
+    /// <description>return value</description>
+    /// </listheader>
+    /// <item>
+    /// <term>G</term>
+    /// <description>QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V</description>
+    /// </item>
+    /// <item>
+    /// <term>L</term>
+    /// <description>base58btc cidv0 dag-pb sha2-256 Qm...</description>
+    /// </item>
+    /// </list>
+    /// </remarks>
+    public string ToString(string format)
     {
-        return hash?.Algorithm.Name == "sha2-256"
-            ? new Cid
-            {
-                Hash = hash,
-                Version = 0,
-                Encoding = "base58btc",
-                ContentType = "dag-pb"
-            }
-            : new Cid
-            {
-                Version = 1,
-                Hash = hash!
-            };
+        switch (format)
+        {
+            case "G":
+                return Encode();
+
+            case "L":
+                var sb = new StringBuilder();
+                _ = sb.Append(Encoding);
+                _ = sb.Append(' ');
+                _ = sb.Append("cidv");
+                _ = sb.Append(Version);
+                _ = sb.Append(' ');
+                _ = sb.Append(ContentType);
+                _ = sb.Append(' ');
+                _ = sb.Append(Hash.Algorithm.Name);
+                _ = sb.Append(' ');
+                _ = sb.Append(MultiBase.Encode(Hash.ToArray(), Encoding)[1..]);
+                return sb.ToString();
+
+            default:
+                throw new FormatException($"Invalid CID format specifier '{format}'.");
+        }
     }
-    /// <inheritdoc />
-    public override int GetHashCode() => Encode().GetHashCode();
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) => (obj is Cid that) && Encode() == that.Encode();
-
-    /// <inheritdoc />
-    public bool Equals(Cid? that) => Encode() == that?.Encode();
 
     /// <summary>
-    ///   Value equality.
+    /// Writes the binary representation of the CID to the specified <see cref="Stream"/>.
     /// </summary>
-    public static bool operator ==(Cid? a, Cid? b) => ReferenceEquals(a, b) || (a is not null && b is not null && a.Equals(b));
+    /// <param name="stream">The <see cref="Stream"/> to write to.</param>
+    public void Write(Stream stream)
+    {
+        using var ms = new MemoryStream();
+        if (Version != 0)
+        {
+            ms.WriteVarint(Version);
+            ms.WriteMultiCodec(ContentType);
+        }
+
+        Hash.Write(ms);
+
+        stream.WriteVarint(ms.Length);
+        ms.Position = 0;
+        ms.CopyTo(stream);
+    }
 
     /// <summary>
-    ///   Value inequality.
+    /// Writes the binary representation of the CID to the specified <see cref="CodedOutputStream"/>.
     /// </summary>
-    public static bool operator !=(Cid? a, Cid? b) => !(a == b);
+    /// <param name="stream">The <see cref="CodedOutputStream"/> to write to.</param>
+    public void Write(CodedOutputStream stream)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
+        using var ms = new MemoryStream();
+        if (Version != 0)
+        {
+            ms.WriteVarint(Version);
+            ms.WriteMultiCodec(ContentType);
+        }
+
+        Hash.Write(ms);
+
+        byte[] bytes = ms.ToArray();
+        stream.WriteLength(bytes.Length);
+        stream.WriteSomeBytes(bytes);
+    }
 
     /// <summary>
-    ///   Implicit casting of a <see cref="string"/> to a <see cref="Cid"/>.
+    /// Throws if a property cannot be set.
     /// </summary>
-    /// <param name="s">
-    ///   A string encoded <b>Cid</b>.
-    /// </param>
-    /// <returns>
-    ///   A new <see cref="Cid"/>.
-    /// </returns>
-    /// <remarks>
-    ///    Equivalent to <code> Cid.Decode(s)</code>
-    /// </remarks>
-    public static implicit operator Cid(string s) => Cid.Decode(s);
-
-    /// <summary>
-    ///   Implicit casting of a <see cref="Cid"/> to a <see cref="string"/>.
-    /// </summary>
-    /// <param name="id">
-    ///   A <b>Cid</b>.
-    /// </param>
-    /// <returns>
-    ///   A new <see cref="string"/>.
-    /// </returns>
-    /// <remarks>
-    ///    Equivalent to <code>Cid.Encode()</code>
-    /// </remarks>
-    public static implicit operator string(Cid id) => id.Encode();
+    /// <exception cref="NotSupportedException">When a property cannot be set.</exception>
+    /// <remarks>Once <see cref="Encode"/> is invoked, the CID's properties cannot be set.</remarks>
+    private void EnsureMutable()
+    {
+        if (_encodedValue is not null)
+        {
+            throw new NotSupportedException("CID cannot be changed.");
+        }
+    }
 }
 
 /// <summary>
-///   Conversion of a <see cref="Cid"/> to and from JSON.
+/// Conversion of a <see cref="Cid"/> to and from JSON.
 /// </summary>
-/// <remarks>
-///   The JSON is just a single string value.
-/// </remarks>
+/// <remarks>The JSON is just a single string value.</remarks>
 public class CidJsonConverter : JsonConverter
 {
-    /// <inheritdoc />
-    public override bool CanConvert(Type objectType) => true;
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool CanRead => true;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool CanWrite => true;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
+    public override bool CanConvert(Type objectType) => true;
+
+    /// <inheritdoc/>
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) =>
+        reader is null
+            ? throw new ArgumentNullException(nameof(reader))
+            : (object?)(reader.Value is string s ? Cid.Decode(s) : null);
+
+    /// <inheritdoc/>
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(writer);
+#else
         if (writer is null)
         {
             throw new ArgumentNullException(nameof(writer));
         }
+#endif
 
         var cid = value as Cid;
         writer.WriteValue(cid?.Encode());
     }
-
-    /// <inheritdoc />
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) =>
-        reader is null ? throw new ArgumentNullException(nameof(reader)) : (object?)(reader.Value is string s ? Cid.Decode(s) : null);
 }
