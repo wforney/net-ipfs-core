@@ -147,10 +147,14 @@ public static class Varint
     /// </exception>
     public static async Task WriteVarintAsync(this Stream stream, long value, CancellationToken cancel = default)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         if (value < 0)
         {
@@ -170,7 +174,12 @@ public static class Varint
             bytes[i++] = v;
             value >>= 7;
         } while (value != 0);
-        await stream.WriteAsync(new ReadOnlyMemory<byte>(bytes, 0, i), cancel)
+        await stream
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+            .WriteAsync(new ReadOnlyMemory<byte>(bytes, 0, i), cancel)
+#else
+            .WriteAsync(bytes, 0, i, cancel)
+#endif
             .ConfigureAwait(false);
     }
 
@@ -220,10 +229,14 @@ public static class Varint
     /// </returns>
     public static async Task<long> ReadVarint64Async(this Stream stream, CancellationToken cancel = default)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         long value = 0;
         int shift = 0;
@@ -231,7 +244,11 @@ public static class Varint
         byte[] buffer = new byte[1];
         while (true)
         {
-            if (1 != await stream.ReadAsync(new Memory<byte>(buffer, 0, 1), cancel).ConfigureAwait(false))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+            if (1 != await stream.ReadAsync(buffer.AsMemory(0, 1), cancel).ConfigureAwait(false))
+#else
+            if (1 != await stream.ReadAsync(buffer, 0, 1, cancel).ConfigureAwait(false))
+#endif
             {
                 if (bytesRead == 0)
                 {
