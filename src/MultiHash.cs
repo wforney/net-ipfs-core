@@ -29,9 +29,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// Creates a new instance of the <see cref="MultiHash"/> class with the specified <see
     /// cref="HashingAlgorithm">Algorithm name</see> and <see cref="Digest"/> value.
     /// </summary>
-    /// <param name="algorithmName">
-    /// A valid IPFS hashing algorithm name, e.g. "sha2-256" or "sha2-512".
-    /// </param>
+    /// <param name="algorithmName">A valid IPFS hashing algorithm name, e.g. "sha2-256" or "sha2-512".</param>
     /// <param name="digest">The digest value as a byte array.</param>
     public MultiHash(string algorithmName, byte[] digest)
     {
@@ -53,9 +51,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// <summary>
     /// Creates a new instance of the <see cref="MultiHash"/> class from the specified byte array.
     /// </summary>
-    /// <param name="buffer">
-    /// A sequence of bytes containing the binary representation of the <b>MultiHash</b>.
-    /// </param>
+    /// <param name="buffer">A sequence of bytes containing the binary representation of the <b>MultiHash</b>.</param>
     /// <remarks>
     /// Reads the binary representation of <see cref="MultiHash"/> from the <paramref name="buffer"/>.
     /// <para>
@@ -124,10 +120,14 @@ public class MultiHash : IEquatable<MultiHash>
     /// </remarks>
     public MultiHash(CodedInputStream stream)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         (Algorithm, Digest) = Read(stream);
     }
@@ -176,8 +176,8 @@ public class MultiHash : IEquatable<MultiHash>
     /// </summary>
     /// <value><b>true</b> if the identity hash algorithm is used; otherwise, <b>false</b>.</value>
     /// <remarks>
-    /// The identity hash is used to inline a small amount of data into a <see cref="Cid"/>.
-    /// When <b>true</b>, the <see cref="Digest"/> is also the content.
+    /// The identity hash is used to inline a small amount of data into a <see cref="Cid"/>. When
+    /// <b>true</b>, the <see cref="Digest"/> is also the content.
     /// </remarks>
     public bool IsIdentityHash => Algorithm.Code == 0;
 
@@ -214,8 +214,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// </summary>
     /// <param name="name">
     /// The name of a hashing algorithm, see <see
-    /// href="https://github.com/multiformats/multicodec/blob/master/table.csv"/> for IPFS
-    /// defined names.
+    /// href="https://github.com/multiformats/multicodec/blob/master/table.csv"/> for IPFS defined names.
     /// </param>
     /// <returns>
     /// The hashing implementation associated with the <paramref name="name"/>. After using the
@@ -234,8 +233,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// </summary>
     /// <param name="code">
     /// The code of a hashing algorithm, see <see
-    /// href="https://github.com/multiformats/multicodec/blob/master/table.csv"/> for IPFS
-    /// defined codes.
+    /// href="https://github.com/multiformats/multicodec/blob/master/table.csv"/> for IPFS defined codes.
     /// </param>
     /// <returns>The name assigned to <paramref name="code"/>.</returns>
     /// <exception cref="KeyNotFoundException">When <paramref name="code"/> is not registered.</exception>
@@ -271,11 +269,7 @@ public class MultiHash : IEquatable<MultiHash>
     public override bool Equals(object? obj) => (obj is MultiHash that) && Equals(that);
 
     /// <inheritdoc/>
-    public bool Equals(MultiHash? that)
-    {
-        return Algorithm.Code == that?.Algorithm.Code
-            && Digest.SequenceEqual(that.Digest);
-    }
+    public bool Equals(MultiHash? that) => Algorithm.Code == that?.Algorithm.Code && Digest.SequenceEqual(that.Digest);
 
     /// <inheritdoc/>
     public override int GetHashCode() => ToString().GetHashCode();
@@ -284,9 +278,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// Determines if the data matches the hash.
     /// </summary>
     /// <param name="data">The data to check.</param>
-    /// <returns>
-    /// <b>true</b> if the data matches the <see cref="MultiHash"/>; otherwise, <b>false</b>.
-    /// </returns>
+    /// <returns><b>true</b> if the data matches the <see cref="MultiHash"/>; otherwise, <b>false</b>.</returns>
     /// <remarks><b>Matches</b> is used to ensure data integrity.</remarks>
     public bool Matches(byte[] data)
     {
@@ -298,6 +290,7 @@ public class MultiHash : IEquatable<MultiHash>
                 return false;
             }
         }
+
         return true;
     }
 
@@ -305,9 +298,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// Determines if the stream data matches the hash.
     /// </summary>
     /// <param name="data">The <see cref="Stream"/> containing the data to check.</param>
-    /// <returns>
-    /// <b>true</b> if the data matches the <see cref="MultiHash"/>; otherwise, <b>false</b>.
-    /// </returns>
+    /// <returns><b>true</b> if the data matches the <see cref="MultiHash"/>; otherwise, <b>false</b>.</returns>
     /// <remarks><b>Matches</b> is used to ensure data integrity.</remarks>
     public bool Matches(Stream data)
     {
@@ -319,6 +310,7 @@ public class MultiHash : IEquatable<MultiHash>
                 return false;
             }
         }
+
         return true;
     }
 
@@ -397,10 +389,14 @@ public class MultiHash : IEquatable<MultiHash>
     /// </remarks>
     public void Write(CodedOutputStream stream)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         stream.WriteInt32(Algorithm.Code);
         stream.WriteLength(Digest.Length);
@@ -463,17 +459,4 @@ public class MultiHash : IEquatable<MultiHash>
             writer.WriteValue(mh?.ToString());
         }
     }
-}
-
-/// <summary>
-/// Provides data for the unknown hashing algorithm event.
-/// </summary>
-public class UnknownHashingAlgorithmEventArgs : EventArgs
-{
-    internal UnknownHashingAlgorithmEventArgs(HashingAlgorithm a) => Algorithm = a;
-
-    /// <summary>
-    /// The <see cref="HashingAlgorithm"/> that is defined for the unknown hashing number.
-    /// </summary>
-    public HashingAlgorithm Algorithm { get; }
 }
