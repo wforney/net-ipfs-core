@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Globalization;
 
 namespace Ipfs;
 
@@ -44,7 +45,7 @@ public static class Base36
             RevAlphabet[c] = (byte)i;
             if (c > '9')
             {
-                RevAlphabet[char.ToLower(c)] = (byte)i;
+                RevAlphabet[char.ToLower(c, CultureInfo.InvariantCulture)] = (byte)i;
             }
         }
     }
@@ -58,7 +59,12 @@ public static class Base36
     /// <returns>
     ///   The encoded Base-36 string in uppercase.
     /// </returns>
-    public static string EncodeToStringUc(byte[] bytes) => Encode(bytes, UcAlphabet);
+    public static string EncodeToStringUc(byte[] bytes)
+    {
+        return bytes is null
+            ? throw new ArgumentNullException(nameof(bytes))
+            : Encode(bytes, UcAlphabet);
+    }
 
     /// <summary>
     ///   Encodes a byte array to a Base-36 string using lowercase characters.
@@ -69,7 +75,12 @@ public static class Base36
     /// <returns>
     ///   The encoded Base-36 string in lowercase.
     /// </returns>
-    public static string EncodeToStringLc(byte[] bytes) => Encode(bytes, LcAlphabet);
+    public static string EncodeToStringLc(byte[] bytes)
+    {
+        return bytes is null
+            ? throw new ArgumentNullException(nameof(bytes))
+            : Encode(bytes, LcAlphabet);
+    }
 
     // Core encoding logic for Base-36 conversion
     private static string Encode(byte[] input, string alphabet)
