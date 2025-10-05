@@ -233,19 +233,19 @@ internal class TcpNetworkProtocol : NetworkProtocol
     }
 }
 
-internal class UdpNetworkProtocol : TcpNetworkProtocol
+internal sealed class UdpNetworkProtocol : TcpNetworkProtocol
 {
     public override string Name => "udp";
     public override uint Code => 273;
 }
 
-internal class DccpNetworkProtocol : TcpNetworkProtocol
+internal sealed class DccpNetworkProtocol : TcpNetworkProtocol
 {
     public override string Name => "dccp";
     public override uint Code => 33;
 }
 
-internal class SctpNetworkProtocol : TcpNetworkProtocol
+internal sealed class SctpNetworkProtocol : TcpNetworkProtocol
 {
     public override string Name => "sctp";
     public override uint Code => 132;
@@ -285,7 +285,7 @@ internal abstract class IpNetworkProtocol : NetworkProtocol
     }
 }
 
-internal class Ipv4NetworkProtocol : IpNetworkProtocol
+internal sealed class Ipv4NetworkProtocol : IpNetworkProtocol
 {
     private static readonly int AddressSize = IPAddress.Any.GetAddressBytes().Length;
 
@@ -308,7 +308,7 @@ internal class Ipv4NetworkProtocol : IpNetworkProtocol
     }
 }
 
-internal class Ipv6NetworkProtocol : IpNetworkProtocol
+internal sealed class Ipv6NetworkProtocol : IpNetworkProtocol
 {
     private static readonly int AddressSize = IPAddress.IPv6Any.GetAddressBytes().Length;
 
@@ -358,12 +358,12 @@ internal class P2pNetworkProtocol : NetworkProtocol
     }
 }
 
-internal class IpfsNetworkProtocol : P2pNetworkProtocol
+internal sealed class IpfsNetworkProtocol : P2pNetworkProtocol
 {
     public override string Name => "ipfs";
 }
 
-internal class OnionNetworkProtocol : NetworkProtocol
+internal sealed class OnionNetworkProtocol : NetworkProtocol
 {
     public byte[] Address { get; private set; } = [];
     public ushort Port { get; private set; }
@@ -405,7 +405,7 @@ internal class OnionNetworkProtocol : NetworkProtocol
         Address = stream.ReadSomeBytes(10)!;
         byte[] bytes = stream.ReadSomeBytes(2)!;
         Port = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(bytes, 0));
-        Value = $"{Address.ToBase32().ToLowerInvariant()}:{Port.ToString(CultureInfo.InvariantCulture)}";
+        Value = string.Format(CultureInfo.InvariantCulture, "{0}:{1}", Address.ToBase32().ToUpperInvariant(), Port);
     }
     public override void WriteValue(CodedOutputStream stream)
     {
@@ -431,31 +431,31 @@ internal abstract class ValuelessNetworkProtocol : NetworkProtocol
     }
 }
 
-internal class QuicNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class QuicNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "quic";
     public override uint Code => 460;
 }
 
-internal class QuicV1NetworkProtocol : ValuelessNetworkProtocol
+internal sealed class QuicV1NetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "quic-v1";
     public override uint Code => 465;
 }
 
-internal class WebRtcDirectNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class WebRtcDirectNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "webrtc-direct";
     public override uint Code => 280;
 }
 
-internal class WebTransportNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class WebTransportNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "webtransport";
     public override uint Code => 461;
 }
 
-internal class CertHashNetworkProtocol : NetworkProtocol
+internal sealed class CertHashNetworkProtocol : NetworkProtocol
 {
     public override string Name => "certhash";
     public override uint Code => 466;
@@ -465,61 +465,61 @@ internal class CertHashNetworkProtocol : NetworkProtocol
     public override void WriteValue(CodedOutputStream stream) => stream.WriteString(Value);
 }
 
-internal class HttpNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class HttpNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "http";
     public override uint Code => 480;
 }
 
-internal class HttpsNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class HttpsNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "https";
     public override uint Code => 443;
 }
 
-internal class TlsNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class TlsNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "tls";
     public override uint Code => 443;
 }
 
-internal class WsNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class WsNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "ws";
     public override uint Code => 477;
 }
 
-internal class WssNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class WssNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "wss";
     public override uint Code => 478;
 }
 
-internal class Libp2pWebrtcStarNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class Libp2pWebrtcStarNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "libp2p-webrtc-star";
     public override uint Code => 275;
 }
 
-internal class Libp2pWebrtcDirectNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class Libp2pWebrtcDirectNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "libp2p-webrtc-direct";
     public override uint Code => 276;
 }
 
-internal class UdtNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class UdtNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "udt";
     public override uint Code => 301;
 }
 
-internal class UtpNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class UtpNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "utp";
     public override uint Code => 302;
 }
 
-internal class P2pCircuitNetworkProtocol : ValuelessNetworkProtocol
+internal sealed class P2pCircuitNetworkProtocol : ValuelessNetworkProtocol
 {
     public override string Name => "p2p-circuit";
     public override uint Code => 290;
@@ -547,31 +547,31 @@ internal abstract class DomainNameNetworkProtocol : NetworkProtocol
     public override void WriteValue(CodedOutputStream stream) => stream.WriteString(DomainName);
 }
 
-internal class DnsNetworkProtocol : DomainNameNetworkProtocol
+internal sealed class DnsNetworkProtocol : DomainNameNetworkProtocol
 {
     public override string Name => "dns";
     public override uint Code => 53;
 }
 
-internal class DnsAddrNetworkProtocol : DomainNameNetworkProtocol
+internal sealed class DnsAddrNetworkProtocol : DomainNameNetworkProtocol
 {
     public override string Name => "dnsaddr";
     public override uint Code => 56;
 }
 
-internal class Dns4NetworkProtocol : DomainNameNetworkProtocol
+internal sealed class Dns4NetworkProtocol : DomainNameNetworkProtocol
 {
     public override string Name => "dns4";
     public override uint Code => 54;
 }
 
-internal class Dns6NetworkProtocol : DomainNameNetworkProtocol
+internal sealed class Dns6NetworkProtocol : DomainNameNetworkProtocol
 {
     public override string Name => "dns6";
     public override uint Code => 55;
 }
 
-internal class IpcidrNetworkProtocol : NetworkProtocol
+internal sealed class IpcidrNetworkProtocol : NetworkProtocol
 {
     public ushort RoutingPrefix { get; set; }
     public override string Name => "ipcidr";
