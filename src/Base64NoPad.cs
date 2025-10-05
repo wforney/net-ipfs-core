@@ -51,10 +51,15 @@ public static class Base64NoPad
     /// </returns>
     public static byte[] Decode(string s)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(s);
+#else
         if (s is null)
         {
             throw new ArgumentNullException(nameof(s));
         }
+#endif
+
         switch (s.Length % 4) // Pad with trailing '='s
         {
             case 0: break; // No pad chars in this case
