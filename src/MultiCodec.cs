@@ -56,10 +56,14 @@ public static class MultiCodec
     /// </remarks>
     public static Codec ReadMultiCodec(this CodedInputStream stream)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         int code = stream.ReadInt32();
         _ = Codec.Codes.TryGetValue(code, out Codec? codec);

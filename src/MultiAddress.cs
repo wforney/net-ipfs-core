@@ -64,10 +64,14 @@ public class MultiAddress : IEquatable<MultiAddress>
     public MultiAddress(IPAddress ip)
         : this()
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(ip);
+#else
         if (ip is null)
         {
             throw new ArgumentNullException(nameof(ip));
         }
+#endif
 
         string type = ip.AddressFamily == AddressFamily.InterNetwork
             ? "ip4" : "ip6";
@@ -80,10 +84,14 @@ public class MultiAddress : IEquatable<MultiAddress>
     public MultiAddress(IPEndPoint endpoint)
         : this()
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(endpoint);
+#else
         if (endpoint is null)
         {
             throw new ArgumentNullException(nameof(endpoint));
         }
+#endif
 
         string type = endpoint.AddressFamily == AddressFamily.InterNetwork ? "ip4" : "ip6";
         Read(new StringReader($"/{type}/{endpoint.Address}/tcp/{endpoint.Port}"));
@@ -240,7 +248,11 @@ public class MultiAddress : IEquatable<MultiAddress>
             code += p.Code.GetHashCode();
             if (p.Value is string s)
             {
+#if NETSTANDARD2_1_OR_GREATER
                 code += s.GetHashCode(System.StringComparison.Ordinal);
+#else
+                code += s.GetHashCode();
+#endif
             }
             else
             {
@@ -353,10 +365,14 @@ public class MultiAddress : IEquatable<MultiAddress>
     /// </remarks>
     public void Write(CodedOutputStream stream)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         foreach (NetworkProtocol protocol in Protocols)
         {
@@ -374,10 +390,14 @@ public class MultiAddress : IEquatable<MultiAddress>
     /// </remarks>
     public void Write(TextWriter stream)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         foreach (NetworkProtocol protocol in Protocols)
         {
@@ -397,10 +417,14 @@ public class MultiAddress : IEquatable<MultiAddress>
     [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "<Pending>")]
     private void Read(Stream stream)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         Read(new CodedInputStream(stream, true));
     }
