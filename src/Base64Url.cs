@@ -59,6 +59,10 @@ public static class Base64Url
     /// </returns>
     public static byte[] Decode(string s)
     {
+        if (s is null)
+        {
+            throw new ArgumentNullException(nameof(s));
+        }
         s = s.Replace('-', '+'); // 62nd char of encoding
         s = s.Replace('_', '/'); // 63rd char of encoding
 
@@ -67,7 +71,7 @@ public static class Base64Url
             case 0: break; // No pad chars in this case
             case 2: s += "=="; break; // Two pad chars
             case 3: s += "="; break; // One pad char
-            default: throw new Exception("Illegal base64url string!");
+            default: throw new FormatException("Illegal base64url string!");
         }
 
         return Convert.FromBase64String(s); // Standard base64 decoder

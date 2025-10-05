@@ -8,17 +8,17 @@ namespace Ipfs;
 /// </summary>
 /// <remarks>
 ///   A <b>DagNode</b> has opaque <see cref="DagNode.DataBytes"/>
-///   and a set of navigable <see cref="DagNode.Links"/>.
+///   and a set of navigable <see cref="DagNode.ReadOnlyLinks"/>.
 /// </remarks>
 [DataContract]
-public class DagNode : IMerkleNode<IMerkleLink>
+public sealed class DagNode : IMerkleNode<IMerkleLink>
 {
     private string _hashAlgorithm = MultiHash.DefaultAlgorithmName;
     private ulong? _size;
 
     /// <summary>
     ///   Create a new instance of a <see cref="DagNode"/> with the specified
-    ///   <see cref="DagNode.DataBytes"/> and <see cref="DagNode.Links"/>
+    ///   <see cref="DagNode.DataBytes"/> and <see cref="DagNode.ReadOnlyLinks"/>
     /// </summary>
     /// <param name="data">
     ///   The opaque data, can be <b>null</b>.
@@ -30,11 +30,14 @@ public class DagNode : IMerkleNode<IMerkleLink>
     ///   The name of the hashing algorithm to use; defaults to
     ///   <see cref="MultiHash.DefaultAlgorithmName"/>.
     /// </param>
-    public DagNode(byte[]? data, IEnumerable<IMerkleLink>? links = null, string hashAlgorithm = MultiHash.DefaultAlgorithmName)
+    public DagNode(ReadOnlyMemory<byte>? data, IEnumerable<IMerkleLink>? links = null, string hashAlgorithm = MultiHash.DefaultAlgorithmName)
     {
-        DataBytes = data ?? [];
-        Links = (links ?? [])
-            .OrderBy(link => link.Name ?? "");
+        DataBytes = data ?? ReadOnlyMemory<byte>.Empty;
+        var orderedLinks = (links ?? Array.Empty<IMerkleLink>())
+            .OrderBy(link => link.Name ?? "")
+            .ToList()
+            .AsReadOnly();
+        ReadOnlyLinks = orderedLinks;
         _hashAlgorithm = hashAlgorithm;
     }
 
@@ -46,7 +49,14 @@ public class DagNode : IMerkleNode<IMerkleLink>
     ///   A <see cref="Stream"/> containing the binary representation of the
     ///   <b>DagNode</b>.
     /// </param>
-    public DagNode(Stream stream) => Read(stream);
+    public DagNode(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        Read(stream);
+    }
 
     /// <summary>
     ///   Creates a new instance of the <see cref="DagNode"/> class from the
@@ -56,18 +66,26 @@ public class DagNode : IMerkleNode<IMerkleLink>
     ///   A <see cref="CodedInputStream"/> containing the binary representation of the
     ///   <b>DagNode</b>.
     /// </param>
-    public DagNode(CodedInputStream stream) => Read(stream);
+    public DagNode(CodedInputStream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        Read(stream);
+    }
 
     /// <inheritdoc />
     [DataMember]
-    public IEnumerable<IMerkleLink> Links { get; private set; } = [];
+    public IReadOnlyCollection<IMerkleLink> ReadOnlyLinks { get; private set; } = Array.Empty<IMerkleLink>();
+    IEnumerable<IMerkleLink> IMerkleNode<IMerkleLink>.Links => ReadOnlyLinks;
 
     /// <inheritdoc />
     [DataMember]
-    public byte[] DataBytes { get; private set; } = [];
+    public ReadOnlyMemory<byte> DataBytes { get; private set; } = ReadOnlyMemory<byte>.Empty;
 
     /// <inheritdoc />
-    public Stream DataStream => new MemoryStream(DataBytes, false);
+    public Stream DataStream => new MemoryStream(DataBytes.ToArray(), false);
 
     /// <summary>
     ///   The serialised size in bytes of the node.
@@ -131,7 +149,7 @@ public class DagNode : IMerkleNode<IMerkleLink>
     /// </remarks>
     public DagNode AddLinks(IEnumerable<IMerkleLink> links)
     {
-        IEnumerable<IMerkleLink> all = Links.Union(links);
+        IReadOnlyCollection<IMerkleLink> all = ReadOnlyLinks.Union(links).ToList().AsReadOnly();
         return new DagNode(DataBytes, all, _hashAlgorithm);
     }
 
@@ -174,7 +192,7 @@ public class DagNode : IMerkleNode<IMerkleLink>
     public DagNode RemoveLinks(IEnumerable<IMerkleLink> links)
     {
         ILookup<Cid, IMerkleLink> ignore = links.ToLookup(link => link.Id);
-        IEnumerable<IMerkleLink> some = Links.Where(link => !ignore.Contains(link.Id));
+        IReadOnlyCollection<IMerkleLink> some = ReadOnlyLinks.Where(link => !ignore.Contains(link.Id)).ToList().AsReadOnly();
         return new DagNode(DataBytes, some, _hashAlgorithm);
     }
 
@@ -198,7 +216,11 @@ public class DagNode : IMerkleNode<IMerkleLink>
     /// </param>
     public void Write(CodedOutputStream stream)
     {
-        foreach (DagLink? link in Links.Select(l => new DagLink(l)))
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        foreach (DagLink? link in ReadOnlyLinks.Select(l => new DagLink(l)))
         {
             using var linkStream = new MemoryStream();
             link.Write(linkStream);
@@ -208,11 +230,11 @@ public class DagNode : IMerkleNode<IMerkleLink>
             stream.WriteSomeBytes(msg);
         }
 
-        if (DataBytes.Length > 0)
+        if (!DataBytes.IsEmpty)
         {
             stream.WriteTag(1, WireFormat.WireType.LengthDelimited);
             stream.WriteLength(DataBytes.Length);
-            stream.WriteSomeBytes(DataBytes);
+            stream.WriteSomeBytes(DataBytes.ToArray());
         }
     }
 
@@ -233,7 +255,7 @@ public class DagNode : IMerkleNode<IMerkleLink>
             switch (WireFormat.GetTagFieldNumber(tag))
             {
                 case 1:
-                    DataBytes = stream.ReadSomeBytes(stream.ReadLength())!;
+                    DataBytes = new ReadOnlyMemory<byte>(stream.ReadSomeBytes(stream.ReadLength())!);
                     done = true;
                     break;
                 case 2:
@@ -247,8 +269,8 @@ public class DagNode : IMerkleNode<IMerkleLink>
             }
         }
 
-        DataBytes ??= [];
-        Links = [.. links];
+        DataBytes = DataBytes.IsEmpty ? ReadOnlyMemory<byte>.Empty : DataBytes;
+        ReadOnlyLinks = links.AsReadOnly();
     }
 
     /// <summary>
