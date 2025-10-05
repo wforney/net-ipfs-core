@@ -1,54 +1,229 @@
-# net-ipfs-core 
+# 🌐 IPFS Core .NET
 
-![Version](https://img.shields.io/nuget/v/IpfsShipyard.Ipfs.Core.svg)
+[![NuGet Version](https://img.shields.io/nuget/v/IpfsShipyard.Ipfs.Core.svg?style=flat-square)](https://www.nuget.org/packages/IpfsShipyard.Ipfs.Core)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/ipfs-shipyard/net-ipfs-core/build.yml?branch=main&style=flat-square)](https://github.com/ipfs-shipyard/net-ipfs-core/actions)
+[![License](https://img.shields.io/github/license/ipfs-shipyard/net-ipfs-core.svg?style=flat-square)](LICENSE)
 
-The core objects and interfaces of the [IPFS](https://github.com/ipfs/ipfs) (Inter Planetary File System) for .Net (C#, VB, F# etc.)
+**The foundational .NET library for IPFS (InterPlanetary File System)** - providing content-addressed, cryptographically secure building blocks for distributed applications.
 
-The interplanetary file system is the permanent web. It is a new hypermedia distribution protocol, addressed by content and identities. IPFS enables the creation of completely distributed applications. It aims to make the web faster, safer, and more open.
+> 🚀 **The permanent web starts here.** IPFS enables creation of completely distributed applications using content addressing and cryptographic hashing. This library provides the core primitives you need to build on the decentralized web.
 
-This library supports .NET Standard 2.0.
+## ✨ Features
 
-## Install
+- 🔗 **Content Identifiers (CID)** - Self-describing content addresses with version compatibility
+- 🔐 **MultiHash** - Cryptographic hash agility with 15+ algorithms (SHA-256, BLAKE2, SHA-3, etc.)  
+- 🌍 **MultiAddress** - Protocol-aware network addressing for peer discovery
+- 📊 **Merkle DAG** - Immutable, verifiable data structures for content integrity
+- 🎯 **Multi-targeting** - .NET Standard 2.0+, .NET 8.0+, .NET 9.0 support
+- ⚡ **High Performance** - Zero-allocation paths and efficient serialization
 
-Published releases are available on [NuGet](https://www.nuget.org/packages/IpfsShipyard.Ipfs.Core).  To install, run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console).
+## 🚀 Quick Start
 
-    PM> Install-Package IpfsShipyard.Ipfs.Core
-    
-Or using [dotnet](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet)
+### Installation
 
-    > dotnet add package IpfsShipyard.Ipfs.Core
+```bash
+dotnet add package IpfsShipyard.Ipfs.Core
+```
 
-## Major objects
+### Basic Usage
 
-- [MerkleDag](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.DagNode.html)
-- [MultiAddress](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.MultiAddress.html)
-- [MultiHash](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.MultiHash.html)
+```csharp
+using Ipfs;
 
-See the [API Documentation](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.html) for a list of all objects.
+// Create content identifiers
+var cid = new Cid("QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V");
+Console.WriteLine($"CID: {cid}");
+Console.WriteLine($"Details: {cid.ToString("L")}"); // base58btc cidv0 dag-pb sha2-256
 
-### MultiHash
+// Work with cryptographic hashes  
+var hash = new MultiHash("sha2-256", Encoding.UTF8.GetBytes("hello world"));
+Console.WriteLine($"Hash: {hash}");
 
-All hashes in IPFS are encoded with [multihash](https://github.com/multiformats/multihash), a self-describing hash format. The actual hash function used depends on security requirements. The cryptosystem of IPFS is upgradeable, meaning that as hash functions are broken, networks can shift to stronger hashes. There is no free lunch, as objects may need to be rehashed, or links duplicated. But ensuring that tools built do not assume a pre-defined length of hash digest means tools that work with today's hash functions will also work with tomorrows longer hash functions too.
+// Network addressing
+var address = new MultiAddress("/ip4/127.0.0.1/tcp/4001/p2p/QmNodeId");
+Console.WriteLine($"Address: {address}");
+
+// String conversion (implicit)
+Cid cidFromString = "QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V";
+MultiAddress addrFromString = "/dns4/node.example.com/tcp/443/wss";
+```
+
+## 🏗️ Core Architecture
+
+### ICoreApi Structure
+The library exposes IPFS functionality through a unified API surface:
+
+```csharp
+ICoreApi.Block       // Block storage operations
+ICoreApi.Dag         // Directed Acyclic Graph operations  
+ICoreApi.FileSystem  // File operations
+ICoreApi.Pin         // Content pinning
+ICoreApi.Swarm       // Peer networking
+// ... 13+ specialized APIs
+```
+
+### Registry Pattern
+Extend functionality through static registries:
+
+```csharp
+// Register custom hash algorithm
+HashingAlgorithm.Register("custom-hash", 0x999, 32, () => new CustomHasher());
+
+// Register custom encoding
+MultiBaseAlgorithm.Register("custom-base", 'x', encoder, decoder);
+```
+
+## 📚 Core Concepts
+
+### Content Identifiers (CID)
+Self-describing content addresses that provide cryptographic guarantees:
+
+```csharp
+// CID v0 (legacy, SHA-256 + dag-pb + base58btc)
+var cidV0 = new Cid("QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V");
+
+// CID v1 (modern, any hash + any codec + any encoding)  
+var cidV1 = new Cid {
+    Version = 1,
+    ContentType = "dag-cbor",
+    Hash = new MultiHash("sha2-512", data),
+    Encoding = "base32"
+};
+
+// Auto-upgrade from v0 to v1 when setting non-default properties
+var upgraded = new Cid("QmHash...") { Encoding = "base32" }; // Now v1
+```
+
+### MultiHash 
+Cryptographic hash agility for future-proof applications:
+
+```csharp
+// Supported algorithms: SHA-1/2/3, BLAKE2b/2s, Keccak, SHAKE, and more
+var sha256 = new MultiHash("sha2-256", data);
+var blake2b = new MultiHash("blake2b-256", data);
+var sha3 = new MultiHash("sha3-512", data);
+
+// Validate hash digest sizes automatically
+var hash = MultiHash.ComputeHash("sha2-256", Encoding.UTF8.GetBytes("hello"));
+```
 
 ### MultiAddress
+Protocol-aware network addressing for multi-transport connectivity:
 
-A standard way to represent a networks address that supports [multiple network protocols](https://github.com/multiformats/multiaddr). It is represented as a series of tuples, a protocol code and an optional value.  For example, an IPFS file at a sepcific address over ipv4 and tcp is 
+```csharp
+// IPv4 + TCP
+var tcpAddr = new MultiAddress("/ip4/127.0.0.1/tcp/4001");
 
-    /ip4/10.1.10.10/tcp/80/ipfs/QmVcSqVEsvm5RR9mBLjwpb2XjFVn5bPdPL69mL8PH45pPC
+// DNS + WebSocket Secure  
+var wsAddr = new MultiAddress("/dns4/node.example.com/tcp/443/wss");
+
+// Complex multi-hop addressing
+var complexAddr = new MultiAddress("/ip4/10.1.10.10/tcp/29087/ipfs/QmNodeId/p2p-circuit/ip4/192.168.1.1/tcp/4002");
+```
 
 ### Merkle DAG
+Immutable, content-addressed data structures:
 
-The [DagNode](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.DagNode.html) is a directed acyclic graph whose edges are a 
-[DagLink](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.DagLink.html). This means that links to objects can authenticate 
-the objects themselves, and that every object contains a secure 
-representation of its children.
+```csharp
+// Create DAG nodes with cryptographic links
+var node = new DagNode {
+    Data = Encoding.UTF8.GetBytes("Hello IPFS"),
+    Links = {
+        new DagLink("child1", childCid1, childSize1),
+        new DagLink("child2", childCid2, childSize2)
+    }
+};
 
-Every Merkle is a directed acyclic graph (DAG) because each node is accessed via its name (the hash of `DagNode`). Each branch of Merkle is the hash of its local content (data and links);  naming children by their hash instead of their full contents. So after creation there is no way to edit a DagNode. This prevents cycles (assuming there are no hash collisions) since one can not link the first created node to the last note to create the last reference. 
+// Nodes are immutable after creation - no cycles possible
+var nodeCid = node.Id; // Content ID derived from node content
+```
 
-## Related Projects
+## 🔧 Advanced Features
 
-- [IPFS HTTP Client](https://github.com/ipfs-shipyard/net-ipfs-http-client) - A .Net client library for the IPFS HTTP API.
+### JSON Serialization
+Seamless dual JSON support with automatic fallback:
 
-## License
-The IPFS Core library is licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form") license. Refer to the [LICENSE](LICENSE) file for more information.
+```csharp
+// Works with both Newtonsoft.Json and System.Text.Json
+var cid = new Cid("QmHash...");
+var json = JsonConvert.SerializeObject(cid);              // Newtonsoft
+var systemJson = JsonSerializer.Serialize(cid);           // System.Text.Json
+
+// Custom JsonCompat utility handles compatibility automatically
+var result = JsonCompat.Serialize(cid, forceNewtonsoft: false);
+```
+
+### Stream Extensions
+Efficient Protocol Buffer varint encoding:
+
+```csharp
+using var stream = new MemoryStream();
+
+// Write variable-length integers
+stream.WriteVarint(12345L);
+stream.WriteVarint(67890L);
+
+stream.Position = 0;
+
+// Read them back
+var value1 = stream.ReadVarint64();
+var value2 = stream.ReadVarint64();
+```
+
+### Immutability Patterns
+Fail-fast design prevents modification after encoding:
+
+```csharp
+var cid = new Cid { Hash = hash }; // Mutable during construction
+var encoded = cid.Encode();        // Now immutable
+
+// This throws NotSupportedException
+cid.Version = 1; // ❌ Cannot modify after encoding
+```
+
+## 🚢 Related Projects
+
+- **[IPFS HTTP Client](https://github.com/ipfs-shipyard/net-ipfs-http-client)** - Full-featured .NET client for IPFS HTTP API
+- **[IPFS Engine](https://github.com/ipfs-shipyard/net-ipfs-engine)** - Embedded IPFS node implementation  
+- **[IPFS.NET](https://github.com/ipfs-shipyard/net-ipfs)** - Complete IPFS toolkit for .NET developers
+
+## 🛠️ Development
+
+### Building
+```bash
+git clone https://github.com/ipfs-shipyard/net-ipfs-core.git
+cd net-ipfs-core
+
+# Restore packages and build
+dotnet build /r
+
+# Run tests
+dotnet test
+
+# Generate documentation
+cd doc && docfx
+```
+
+### Contributing
+We welcome contributions! This project is maintained by the IPFS Shipyard community, building on the foundation established by Richard Schneider.
+
+1. 🍴 Fork the repository
+2. 🌟 Create a feature branch
+3. ✅ Ensure tests pass
+4. 📝 Update documentation
+5. 🚀 Submit a pull request
+
+## 📖 Documentation
+
+- **[API Reference](https://richardschneider.github.io/net-ipfs-core/api/Ipfs.html)** - Complete API documentation
+- **[IPFS Specs](https://github.com/ipfs/specs)** - IPFS protocol specifications
+- **[MultiFormats](https://github.com/multiformats)** - Self-describing format standards
+
+## 📄 License
+
+Licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
+
+---
+
+**Built with ❤️ by the IPFS Shipyard community** | [🌟 Star us on GitHub](https://github.com/ipfs-shipyard/net-ipfs-core)
 
