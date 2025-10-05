@@ -124,7 +124,7 @@ Added missing IFileSystemApi.ListAsync. Doesn't fully replace the removed IFileS
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <!-- Introduce System.Text.Json for gradual migration; keep Newtonsoft.Json for public API surface -->
-        <PackageReference Include="System.Text.Json" Version="9.0.0" />
+        <PackageReference Include="System.Text.Json" Version="9.0.9" />
         <PackageReference Include="PolySharp" Version="1.15.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
