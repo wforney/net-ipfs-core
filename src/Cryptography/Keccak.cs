@@ -13,22 +13,13 @@ namespace Ipfs.Cryptography;
 internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
 {
     public const int KeccakB = 1600;
-    public const int KeccakNumberOfRounds = 24;
     public const int KeccakLaneSizeInBits = 8 * 8;
-
+    public const int KeccakNumberOfRounds = 24;
     public readonly ulong[] RoundConstants;
 
-    protected new ulong[] State = new ulong[5 * 5];  //1600 bits
     protected byte[]? Buffer;
     protected int BuffLength;
-
-        public int KeccakR { get; protected set; }
-
-    public int SizeInBytes => KeccakR / 8;
-
-    public int HashByteLength => HashSizeValue / 8;
-
-    public override bool CanReuseTransform => true;
+    protected new ulong[] State = new ulong[5 * 5];  //1600 bits
 
     protected Keccak(int hashBitLength)
     {
@@ -44,15 +35,19 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
             case 224:
                 KeccakR = 1152;
                 break;
+
             case 256:
                 KeccakR = 1088;
                 break;
+
             case 384:
                 KeccakR = 832;
                 break;
+
             case 512:
                 KeccakR = 576;
                 break;
+
             default:
                 break;
         }
@@ -85,9 +80,19 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
         ];
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
-    protected ulong ROL(ulong a, int offset) =>
-        (((a) << (offset % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - (offset % KeccakLaneSizeInBits))))!;
+    public override bool CanReuseTransform => true;
+    public override byte[] Hash => HashValue!;
+    public int HashByteLength => HashSizeValue / 8;
+    public override int HashSize => HashSizeValue;
+    public int KeccakR { get; protected set; }
+
+    public int SizeInBytes => KeccakR / 8;
+
+    public override void Initialize()
+    {
+        BuffLength = 0;
+        HashValue = null;
+    }
 
     protected void AddToBuffer(byte[] array, ref int offset, ref int count)
     {
@@ -96,16 +101,6 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
         offset += amount;
         BuffLength += amount;
         count -= amount;
-    }
-
-    public override byte[] Hash => HashValue!;
-
-    public override int HashSize => HashSizeValue;
-
-    public override void Initialize()
-    {
-        BuffLength = 0;
-        HashValue = null;
     }
 
     protected override void HashCore(byte[] array, int ibStart, int cbSize)
@@ -125,4 +120,8 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
             throw new ArgumentOutOfRangeException(nameof(ibStart), "ibStart or cbSize");
         }
     }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
+    protected ulong ROL(ulong a, int offset) =>
+        (((a) << (offset % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - (offset % KeccakLaneSizeInBits))))!;
 }
