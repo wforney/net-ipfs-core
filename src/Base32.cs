@@ -24,7 +24,12 @@ public static class Base32
     /// <param name="input">The base 32 string to convert.</param>
     /// <returns>An array of 8-bit unsigned integers that is equivalent to <paramref name="input"/>.</returns>
     /// <remarks><paramref name="input"/> is case-insensitive and allows padding.</remarks>
-    public static byte[] Decode(string input) => SimpleBase.Base32.Rfc4648.Decode(input).ToArray();
+    public static byte[] Decode(string input)
+    {
+        return input is null
+            ? throw new ArgumentNullException(nameof(input))
+            : [.. SimpleBase.Base32.Rfc4648.Decode(input)];
+    }
 
     /// <summary>
     /// Converts an array of 8-bit unsigned integers to its equivalent string representation that is
@@ -32,7 +37,12 @@ public static class Base32
     /// </summary>
     /// <param name="input">An array of 8-bit unsigned integers.</param>
     /// <returns>The string representation, in base 32, of the contents of <paramref name="input"/>.</returns>
-    public static string Encode(byte[] input) => SimpleBase.Base32.Rfc4648.Encode(input, false).ToLowerInvariant();
+    public static string Encode(byte[] input)
+    {
+        return input is null
+            ? throw new ArgumentNullException(nameof(input))
+            : SimpleBase.Base32.Rfc4648.Encode(input, false).ToUpperInvariant();
+    }
 
     /// <summary>
     /// Converts the specified <see cref="string"/>, which encodes binary data as base 32 digits, to
@@ -40,7 +50,12 @@ public static class Base32
     /// </summary>
     /// <param name="s">The base 32 string to convert; case-insensitive and allows padding.</param>
     /// <returns>An array of 8-bit unsigned integers that is equivalent to <paramref name="s"/>.</returns>
-    public static byte[] FromBase32(this string s) => Decode(s);
+    public static byte[] FromBase32(this string s)
+    {
+        return s is null
+            ? throw new ArgumentNullException(nameof(s))
+            : Decode(s);
+    }
 
     /// <summary>
     /// Converts an array of 8-bit unsigned integers to its equivalent string representation that is
@@ -48,5 +63,10 @@ public static class Base32
     /// </summary>
     /// <param name="bytes">An array of 8-bit unsigned integers.</param>
     /// <returns>The string representation, in base 32, of the contents of <paramref name="bytes"/>.</returns>
-    public static string ToBase32(this byte[] bytes) => Encode(bytes);
+    public static string ToBase32(this byte[] bytes)
+    {
+        return bytes is null
+            ? throw new ArgumentNullException(nameof(bytes))
+            : Encode(bytes);
+    }
 }
