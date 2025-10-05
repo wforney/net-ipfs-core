@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <DebugType>portable</DebugType>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IsPackable>false</IsPackable>
         <NoWarn>$(NoWarn);MSTEST0036;MSTEST0039</NoWarn>
         <RootNamespace>Ipfs</RootNamespace>

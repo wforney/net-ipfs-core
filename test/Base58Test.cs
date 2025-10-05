@@ -1,13 +1,16 @@
-using System;
-using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Ipfs;
 
+/// <summary>
+/// Tests for <see cref="Base58"/>.
+/// </summary>
 [TestClass]
 public class Base58Test
 {
+    /// <summary>
+    /// C# version of base58DecodeTest in <see href="https://github.com/ipfs/java-ipfs-api/blob/master/test/org/ipfs/Test.java"/>
+    /// </summary>
     [TestMethod]
     public void Decode()
     {
@@ -15,9 +18,15 @@ public class Base58Test
         Assert.AreEqual("this is a test", Encoding.UTF8.GetString("jo91waLQA1NNeBmZKUF".FromBase58()));
     }
 
+    /// <summary>
+    /// C# version of base58DecodeBadTest in <see href="https://github.com/ipfs/java-ipfs-api/blob/master/test/org/ipfs/Test.java"/>
+    /// </summary>
     [TestMethod]
     public void Decode_Bad() => ExceptionAssert.Throws<ArgumentException>(() => Base58.Decode("jo91waLQA1NNeBmZKUF=="));
 
+    /// <summary>
+    /// C# version of base58EncodeTest in <see href="https://github.com/ipfs/java-ipfs-api/blob/master/test/org/ipfs/Test.java"/>
+    /// </summary>
     [TestMethod]
     public void Encode()
     {
@@ -37,11 +46,14 @@ public class Base58Test
         Assert.AreEqual(input, encoded);
     }
 
+    /// <summary>
+    /// C# version of base58ZeroTest in <see href="https://github.com/ipfs/java-ipfs-api/blob/master/test/org/ipfs/Test.java"/>
+    /// </summary>
     [TestMethod]
     public void Zero()
     {
         Assert.AreEqual("1111111", Base58.Encode(new byte[7]));
-        Assert.AreEqual(7, Base58.Decode("1111111").Length);
+        Assert.HasCount(7, Base58.Decode("1111111"));
         Assert.IsTrue(Base58.Decode("1111111").All(b => b == 0));
     }
 }

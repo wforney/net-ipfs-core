@@ -4,9 +4,15 @@ using Newtonsoft.Json;
 
 namespace Ipfs;
 
+/// <summary>
+/// Tests for <see cref="Cid"/>.
+/// </summary>
 [TestClass]
 public class CidTest
 {
+    /// <summary>
+    /// Tests the default format of <see cref="Cid.ToString()"/>.
+    /// </summary>
     [TestMethod]
     public void ToString_Default()
     {
@@ -17,6 +23,9 @@ public class CidTest
         Assert.AreEqual("zBunRGrmCGokA1oMESGGTfrtcMFsVA8aEtcNzM54akPWXF97uXCqTjF3GZ9v8YzxHrG66J8QhtPFWwZebRZ2zeUEELu67", cid.ToString());
     }
 
+    /// <summary>
+    /// Tests the long format of <see cref="Cid.ToString(string)"/>.
+    /// </summary>
     [TestMethod]
     public void ToString_L()
     {
@@ -27,6 +36,9 @@ public class CidTest
         Assert.AreEqual("base58btc cidv1 dag-pb sha2-512 8Vx9QNCcSt39anEamkkSaNw5rDHQ7yuadq7ihZed477qQNXxYr3HReMamd1Q2EnUeL4oNtVAmNw1frEhEN1aoqFuKD", cid.ToString("L"));
     }
 
+    /// <summary>
+    /// Tests the general format of <see cref="Cid.ToString(string)"/>.
+    /// </summary>
     [TestMethod]
     public void ToString_G()
     {
@@ -37,6 +49,9 @@ public class CidTest
         Assert.AreEqual("zBunRGrmCGokA1oMESGGTfrtcMFsVA8aEtcNzM54akPWXF97uXCqTjF3GZ9v8YzxHrG66J8QhtPFWwZebRZ2zeUEELu67", cid.ToString("G"));
     }
 
+    /// <summary>
+    /// Tests that an invalid format throws <see cref="FormatException"/>.
+    /// </summary>
     [TestMethod]
     public void ToString_InvalidFormat()
     {
@@ -44,6 +59,9 @@ public class CidTest
         _ = ExceptionAssert.Throws<FormatException>(() => cid.ToString("?"));
     }
 
+    /// <summary>
+    /// Tests that a <see cref="MultiHash"/> can be implicitly converted to a <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void MultiHash_is_Cid_V0()
     {
@@ -55,6 +73,9 @@ public class CidTest
         Assert.AreSame(mh, cid.Hash);
     }
 
+    /// <summary>
+    /// Tests that a <see cref="MultiHash"/> can be implicitly converted to a <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void MultiHash_is_Cid_V1()
     {
@@ -67,6 +88,9 @@ public class CidTest
         Assert.AreSame(mh, cid.Hash);
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Encode"/> for version 0 CIDs.
+    /// </summary>
     [TestMethod]
     public void Encode_V0()
     {
@@ -85,6 +109,9 @@ public class CidTest
         Assert.AreEqual(0, cid.Version);
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Encode"/> for version 1 CIDs.
+    /// </summary>
     [TestMethod]
     public void Encode_V1()
     {
@@ -107,10 +134,12 @@ public class CidTest
         Assert.AreEqual("bafkreifzjut3te2nhyekklss27nh3k72ysco7y32koao5eei66wof36n5e", cid.Encode());
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Encode"/> for version 0 CIDs that are upgraded to version 1.
+    /// </summary>
     [TestMethod]
     public void Encode_Upgrade_to_V1_ContentType()
     {
-
         var cid = new Cid
         {
             ContentType = "raw",
@@ -121,10 +150,12 @@ public class CidTest
         Assert.AreEqual("bafkreifzjut3te2nhyekklss27nh3k72ysco7y32koao5eei66wof36n5e", cid.Encode());
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Encode"/> for version 0 CIDs that are upgraded to version 1.
+    /// </summary>
     [TestMethod]
     public void Encode_Upgrade_to_V1_Encoding()
     {
-
         var cid = new Cid
         {
             Encoding = "base64",
@@ -134,6 +165,9 @@ public class CidTest
         Assert.AreEqual("mAXASILlNJ7mTTT4IpS5S19p9q/rEhO/jelOA7pCI96zi783p", cid.Encode());
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Encode"/> for version 0 CIDs that are upgraded to version 1.
+    /// </summary>
     [TestMethod]
     public void Encode_Upgrade_to_V1_Hash()
     {
@@ -148,6 +182,9 @@ public class CidTest
         Assert.AreEqual("bafybgqfnbq34ghljwmk7hka7cpem3zybbffnsfzfxinq3qyztsuxcntbxaua23xx42hrgptcchrolkndcucelv3pc4eoarjbwdxagtylboxsm", cid.Encode());
     }
 
+    /// <summary>
+    /// Tests that an invalid content type throws <see cref="KeyNotFoundException"/>.
+    /// </summary>
     [TestMethod]
     public void Encode_V1_Invalid_ContentType()
     {
@@ -161,6 +198,9 @@ public class CidTest
         _ = Assert.ThrowsException<KeyNotFoundException>(cid.Encode);
     }
 
+    /// <summary>
+    /// Tests that an invalid encoding throws <see cref="KeyNotFoundException"/>.
+    /// </summary>
     [TestMethod]
     public void Encode_V1_Invalid_Encoding()
     {
@@ -174,6 +214,9 @@ public class CidTest
         _ = Assert.ThrowsException<KeyNotFoundException>(cid.Encode);
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Decode"/> for version 0 CIDs.
+    /// </summary>
     [TestMethod]
     public void Decode_V0()
     {
@@ -185,6 +228,9 @@ public class CidTest
         Assert.AreEqual(hash, cid.Encode());
     }
 
+    /// <summary>
+    /// Tests that an invalid version 0 CID throws <see cref="FormatException"/>.
+    /// </summary>
     [TestMethod]
     public void Decode_V0_Invalid()
     {
@@ -192,6 +238,9 @@ public class CidTest
         _ = Assert.ThrowsException<FormatException>(() => Cid.Decode(hash));
     }
 
+    /// <summary>
+    /// Tests that an invalid version throws <see cref="FormatException"/>.
+    /// </summary>
     [TestMethod]
     public void Decode_Invalid_Version()
     {
@@ -206,6 +255,9 @@ public class CidTest
         _ = Assert.ThrowsException<FormatException>(() => Cid.Decode(s));
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Decode"/> for version 1 CIDs.
+    /// </summary>
     [TestMethod]
     public void Decode_V1()
     {
@@ -218,6 +270,9 @@ public class CidTest
         Assert.AreEqual(hash, cid.Hash);
     }
 
+    /// <summary>
+    /// Tests <see cref="Cid.Decode"/> for version 1 CIDs with an unknown content type.
+    /// </summary>
     [TestMethod]
     public void Decode_V1_Unknown_ContentType()
     {
@@ -230,6 +285,9 @@ public class CidTest
         Assert.AreEqual(hash, cid.Hash);
     }
 
+    /// <summary>
+    /// Tests that an invalid version 1 CID throws <see cref="FormatException"/>.
+    /// </summary>
     [TestMethod]
     public void Decode_V1_Invalid_MultiBase_String()
     {
@@ -237,6 +295,9 @@ public class CidTest
         _ = Assert.ThrowsException<FormatException>(() => Cid.Decode(id));
     }
 
+    /// <summary>
+    /// Tests that an invalid version 1 CID throws <see cref="FormatException"/>.
+    /// </summary>
     [TestMethod]
     public void Decode_V1_Invalid_MultiBase_Code()
     {
@@ -244,6 +305,9 @@ public class CidTest
         _ = Assert.ThrowsException<FormatException>(() => Cid.Decode(id));
     }
 
+    /// <summary>
+    /// Tests the equality members of <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void Value_Equality()
     {
@@ -287,6 +351,9 @@ public class CidTest
         Assert.AreNotEqual(a0.GetHashCode(), b.GetHashCode());
     }
 
+    /// <summary>
+    /// Tests the implicit conversion between <see cref="string"/> and <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void Implicit_Conversion_From_V0_String()
     {
@@ -298,6 +365,9 @@ public class CidTest
         Assert.AreEqual(hash, cid.Encode());
     }
 
+    /// <summary>
+    /// Tests the implicit conversion between <see cref="string"/> and <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void Implicit_Conversion_From_V1_String()
     {
@@ -310,6 +380,9 @@ public class CidTest
         Assert.AreEqual(hash, cid.Hash);
     }
 
+    /// <summary>
+    /// Tests the implicit conversion between <see cref="string"/> and <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void Implicit_Conversion_To_String()
     {
@@ -319,6 +392,9 @@ public class CidTest
         Assert.AreEqual(id, s);
     }
 
+    /// <summary>
+    /// Tests streaming a <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void Streaming_V0()
     {
@@ -332,6 +408,9 @@ public class CidTest
         Assert.AreEqual(cid.Hash, clone.Hash);
     }
 
+    /// <summary>
+    /// Tests streaming a <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void Streaming_V1()
     {
@@ -344,6 +423,10 @@ public class CidTest
         Assert.AreEqual(cid.ContentType, clone.ContentType);
         Assert.AreEqual(cid.Hash, clone.Hash);
     }
+
+    /// <summary>
+    /// Tests streaming a <see cref="Cid"/> using Protocol Buffers.
+    /// </summary>
     [TestMethod]
     public void Protobuf_V0()
     {
@@ -360,6 +443,9 @@ public class CidTest
         Assert.AreEqual(cid.Hash, clone.Hash);
     }
 
+    /// <summary>
+    /// Tests streaming a <see cref="Cid"/> using Protocol Buffers.
+    /// </summary>
     [TestMethod]
     public void Protobuf_V1()
     {
@@ -376,6 +462,9 @@ public class CidTest
         Assert.AreEqual(cid.Hash, clone.Hash);
     }
 
+    /// <summary>
+    /// Tests that a <see cref="Cid"/> is immutable.
+    /// </summary>
     [TestMethod]
     public void Immutable()
     {
@@ -393,6 +482,9 @@ public class CidTest
         public int X;
     }
 
+    /// <summary>
+    /// Tests JSON serialization of <see cref="Cid"/>.
+    /// </summary>
     [TestMethod]
     public void JsonSerialization()
     {
@@ -422,6 +514,9 @@ public class CidTest
         Assert.AreEqual(x.X, y.X);
     }
 
+    /// <summary>
+    /// Tests byte array serialization of <see cref="Cid"/> version 1.
+    /// </summary>
     [TestMethod]
     public void ByteArrays_V1()
     {
@@ -434,6 +529,9 @@ public class CidTest
         Assert.AreEqual(cid.Hash, clone.Hash);
     }
 
+    /// <summary>
+    /// Tests byte array serialization of <see cref="Cid"/> version 0.
+    /// </summary>
     [TestMethod]
     public void ByteArrays_V0()
     {
