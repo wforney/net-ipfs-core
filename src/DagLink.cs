@@ -29,6 +29,15 @@ public class DagLink : IMerkleLink
     /// </param>
     public DagLink(IMerkleLink link)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(link);
+#else
+        if (link is null)
+        {
+            throw new ArgumentNullException(nameof(link));
+        }
+#endif
+
         Name = link.Name;
         Id = link.Id;
         Size = link.Size;
@@ -44,6 +53,15 @@ public class DagLink : IMerkleLink
     /// </param>
     public DagLink(Stream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
         (Name, Id, Size) = Read(stream);
     }
 
@@ -57,6 +75,15 @@ public class DagLink : IMerkleLink
     /// </param>
     public DagLink(CodedInputStream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
         (Name, Id, Size) = Read(stream);
     }
 
@@ -77,6 +104,15 @@ public class DagLink : IMerkleLink
     /// </param>
     public void Write(Stream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
         using var cos = new CodedOutputStream(stream, true);
         Write(cos);
     }
@@ -89,6 +125,15 @@ public class DagLink : IMerkleLink
     /// </param>
     public void Write(CodedOutputStream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
         stream.WriteTag(1, WireFormat.WireType.LengthDelimited);
         Id.Write(stream);
 
@@ -102,14 +147,32 @@ public class DagLink : IMerkleLink
         stream.WriteInt64((long)Size);
     }
 
-    private (string?, Cid, ulong) Read(Stream stream)
+    private static (string?, Cid, ulong) Read(Stream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
         using var cis = new CodedInputStream(stream, true);
         return Read(cis);
     }
 
-    private (string?, Cid, ulong) Read(CodedInputStream stream)
+    private static (string?, Cid, ulong) Read(CodedInputStream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
+        if (stream is null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+#endif
+
         string? name = null;
         Cid? id = null;
         ulong size = 0;
