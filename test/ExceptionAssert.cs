@@ -39,22 +39,18 @@ namespace Ipfs
 
                 return e;
             }
-            Assert.Fail("Exception of type {0} should be thrown.", typeof(T));
+            Assert.Fail($"Exception of type {typeof(T)} should be thrown.");
 
             //  The compiler doesn't know that Assert.Fail will always throw an exception
             throw new Exception();
         }
 
         // Avoids analyzer recommendations related to unused values.
-        public static T Throws<T, TTest>(Func<TTest> func) where T : Exception
-        {
-            return Throws<T>(() => { var t = func(); });
-        }
+        public static T Throws<T, TTest>(Func<TTest> func) where T : Exception =>
+            Throws<T>(() => { var _ = func(); });
 
         // Avoids analyzer recommendations related to unused values.
-        public static T Throws<T, TTest>(Func<TTest> func, string? expectedMessage = null) where T : Exception
-        {
-            return Throws<T>(() => { var t = func(); }, expectedMessage);
-        }
+        public static T Throws<T, TTest>(Func<TTest> func, string? expectedMessage = null) where T : Exception =>
+            Throws<T>(() => { var _ = func(); }, expectedMessage);
     }
 }

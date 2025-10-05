@@ -48,7 +48,7 @@ Unified CI workflow templates. (#44)
 Internal refactors/cleanup.
 
 [Dependencies]
-Microsoft.Bcl.AsyncInterfaces 9.0.8.
+Microsoft.Bcl.AsyncInterfaces 9.0.9.
 Portable.BouncyCastle 1.9.0.
 Test stack updates (MSTest.TestFramework/Adapter 3.10.2; Microsoft.NET.Test.Sdk 17.14.1). (#52)
 
@@ -123,6 +123,8 @@ Added missing IFileSystemApi.ListAsync. Doesn't fully replace the removed IFileS
         <PackageReference Include="Google.Protobuf" Version="3.32.1" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <!-- Introduce System.Text.Json for gradual migration; keep Newtonsoft.Json for public API surface -->
+        <PackageReference Include="System.Text.Json" Version="9.0.0" />
         <PackageReference Include="PolySharp" Version="1.15.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

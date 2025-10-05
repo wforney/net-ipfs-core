@@ -1,7 +1,7 @@
 ﻿namespace Ipfs.Registry;
 
 /// <summary>
-///   Metadata and implemetations of an IPFS multi-base algorithm.
+///   Metadata and implementations of an IPFS multi-base algorithm.
 /// </summary>
 /// <remarks>
 ///   IPFS assigns a unique <see cref="Name"/> and <see cref="Code"/> to multi-base algorithm.
@@ -24,62 +24,23 @@ public class MultiBaseAlgorithm
     /// <seealso href="https://github.com/multiformats/multibase/blob/master/multibase.csv"/>
     static MultiBaseAlgorithm()
     {
-        Register("base58btc", 'z',
-            static bytes => SimpleBase.Base58.Bitcoin.Encode(bytes),
-            static s => SimpleBase.Base58.Bitcoin.Decode(s).ToArray());
-        Register("base58flickr", 'Z',
-            static bytes => SimpleBase.Base58.Flickr.Encode(bytes),
-            static s => SimpleBase.Base58.Flickr.Decode(s).ToArray());
-        Register("base64", 'm',
-            static bytes => bytes.ToBase64NoPad(),
-            static s => s.FromBase64NoPad());
-        Register("base64pad", 'M',
-            static bytes => Convert.ToBase64String(bytes),
-            static s => Convert.FromBase64String(s));
-        Register("base64url", 'u',
-            static bytes => bytes.ToBase64Url(),
-            static s => s.FromBase64Url());
-        Register("base16", 'f',
-            static bytes => SimpleBase.Base16.EncodeLower(bytes),
-            static s => SimpleBase.Base16.Decode(s).ToArray());
-        Register("base32", 'b',
-            static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false).ToLowerInvariant(),
-            static s => SimpleBase.Base32.Rfc4648.Decode(s).ToArray());
-        Register("base32pad", 'c',
-            static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true).ToLowerInvariant(),
-            static s => SimpleBase.Base32.Rfc4648.Decode(s).ToArray());
-        Register("base32hex", 'v',
-            static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false).ToLowerInvariant(),
-            static s => SimpleBase.Base32.ExtendedHex.Decode(s).ToArray());
-        Register("base32hexpad", 't',
-            static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true).ToLowerInvariant(),
-            static s => SimpleBase.Base32.ExtendedHex.Decode(s).ToArray());
-        Register("base36", 'k', Base36.EncodeToStringLc, Base36.DecodeString);
-        Register("BASE16", 'F',
-            static bytes => SimpleBase.Base16.EncodeUpper(bytes),
-            static s => SimpleBase.Base16.Decode(s).ToArray());
-        Register("BASE32", 'B',
-            static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false),
-            static s => SimpleBase.Base32.Rfc4648.Decode(s).ToArray());
-        Register("BASE32PAD", 'C',
-            static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true),
-            static s => SimpleBase.Base32.Rfc4648.Decode(s).ToArray());
-        Register("BASE32HEX", 'V',
-            static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false),
-            static s => SimpleBase.Base32.ExtendedHex.Decode(s).ToArray());
-        Register("BASE32HEXPAD", 'T',
-            static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true),
-            static s => SimpleBase.Base32.ExtendedHex.Decode(s).ToArray());
-        Register("base32z", 'h',
-            static bytes => Base32z.Codec.Encode(bytes, false),
-            static s => Base32z.Codec.Decode(s).ToArray());
-        // Not supported
-#if false
-        Register("base1", '1');
-        Register("base2", '0');
-        Register("base8", '7');
-        Register("base10", '9');
-#endif
+        _ = Register("base58btc", 'z', static bytes => SimpleBase.Base58.Bitcoin.Encode(bytes), static s => ToByteArray(SimpleBase.Base58.Bitcoin.Decode(s)));
+        _ = Register("base58flickr", 'Z', static bytes => SimpleBase.Base58.Flickr.Encode(bytes), static s => ToByteArray(SimpleBase.Base58.Flickr.Decode(s)));
+        _ = Register("base64", 'm', static bytes => bytes.ToBase64NoPad(), static s => s.FromBase64NoPad());
+        _ = Register("base64pad", 'M', static bytes => Convert.ToBase64String(bytes), static s => Convert.FromBase64String(s));
+        _ = Register("base64url", 'u', static bytes => bytes.ToBase64Url(), static s => s.FromBase64Url());
+        _ = Register("base16", 'f', static bytes => HexLower(bytes), static s => ToByteArray(SimpleBase.Base16.Decode(s)));
+        _ = Register("base32", 'b', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
+        _ = Register("base32pad", 'c', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
+        _ = Register("base32hex", 'v', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
+        _ = Register("base32hexpad", 't', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
+        _ = Register("base36", 'k', Base36.EncodeToStringLc, Base36.DecodeString);
+        _ = Register("BASE16", 'F', static bytes => HexUpper(bytes), static s => ToByteArray(SimpleBase.Base16.Decode(s)));
+        _ = Register("BASE32", 'B', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
+        _ = Register("BASE32PAD", 'C', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
+        _ = Register("BASE32HEX", 'V', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
+        _ = Register("BASE32HEXPAD", 'T', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
+        _ = Register("base32z", 'h', static bytes => Base32z.Codec.Encode(bytes, false), static s => ToByteArray(Base32z.Codec.Decode(s)));
     }
 
     /// <summary>
@@ -161,8 +122,8 @@ public class MultiBaseAlgorithm
             throw new ArgumentException($"The IPFS multi-base algorithm code '{code}' is already defined.");
         }
 
-        encode ??= bytes => throw new NotImplementedException($"The IPFS encode multi-base algorithm '{name}' is not implemented.");
-        decode ??= s => throw new NotImplementedException($"The IPFS decode multi-base algorithm '{name}' is not implemented.");
+        encode ??= _ => throw new NotImplementedException($"The IPFS encode multi-base algorithm '{name}' is not implemented.");
+        decode ??= _ => throw new NotImplementedException($"The IPFS decode multi-base algorithm '{name}' is not implemented.");
 
         var a = new MultiBaseAlgorithm
         {
@@ -173,7 +134,6 @@ public class MultiBaseAlgorithm
         };
         Names[name] = a;
         Codes[code] = a;
-
         return a;
     }
 
@@ -193,4 +153,27 @@ public class MultiBaseAlgorithm
     ///   A sequence consisting of all algorithms.
     /// </summary>
     public static IEnumerable<MultiBaseAlgorithm> All => Names.Values;
+
+    private static string HexLower(byte[] bytes) => Hex(bytes, false);
+    private static string HexUpper(byte[] bytes) => Hex(bytes, true);
+    private static string Hex(byte[] bytes, bool upper)
+    {
+        if (bytes is null)
+        {
+            throw new ArgumentNullException(nameof(bytes));
+        }
+        char[] c = new char[bytes.Length * 2];
+        int i = 0;
+        foreach (byte b in bytes)
+        {
+            int hi = b >> 4;
+            int lo = b & 0xF;
+            c[i++] = ToHexChar(hi, upper);
+            c[i++] = ToHexChar(lo, upper);
+        }
+        return new string(c);
+    }
+    private static char ToHexChar(int value, bool upper) => (char)(value < 10 ? '0' + value : (upper ? 'A' : 'a') + (value - 10));
+
+    private static byte[] ToByteArray(ReadOnlySpan<byte> span) => span.ToArray();
 }
