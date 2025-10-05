@@ -2,7 +2,7 @@
 
 namespace Ipfs.Cryptography;
 
-internal class IdentityHash : HashAlgorithm
+internal sealed class IdentityHash : HashAlgorithm
 {
     private byte[]? _digest;
 

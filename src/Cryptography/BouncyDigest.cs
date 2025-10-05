@@ -6,7 +6,7 @@
 /// <remarks>
 ///   Makes a Bouncy Caslte IDigest speak .Net HashAlgorithm.
 /// </remarks>
-internal class BouncyDigest : System.Security.Cryptography.HashAlgorithm
+internal sealed class BouncyDigest : System.Security.Cryptography.HashAlgorithm
 {
     private readonly Org.BouncyCastle.Crypto.IDigest _digest;
 

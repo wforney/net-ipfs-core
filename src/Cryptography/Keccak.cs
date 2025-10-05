@@ -22,10 +22,7 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
     protected byte[]? Buffer;
     protected int BuffLength;
 
-    public int KeccakR
-    {
-        get => field; protected set => field = value;
-    }
+        public int KeccakR { get; protected set; }
 
     public int SizeInBytes => KeccakR / 8;
 

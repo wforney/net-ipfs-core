@@ -7,7 +7,7 @@
 
 namespace Ipfs.Cryptography;
 
-internal partial class KeccakManaged : Keccak
+internal sealed class KeccakManaged : Keccak
 {
     public KeccakManaged(int hashBitLength)
         : base(hashBitLength)
@@ -24,7 +24,7 @@ internal partial class KeccakManaged : Keccak
         int stride = sizeInBytes >> 3;
         ulong[] utemps = new ulong[stride];
         if (BuffLength == sizeInBytes)
-            throw new Exception("Unexpected error, the internal buffer is full");
+            throw new InvalidOperationException("Unexpected error, the internal buffer is full");
         AddToBuffer(array, ref ibStart, ref cbSize);
         if (BuffLength == sizeInBytes)//buffer full
         {
