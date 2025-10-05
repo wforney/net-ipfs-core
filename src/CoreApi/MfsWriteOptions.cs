@@ -13,7 +13,7 @@ public class MfsWriteOptions
     /// <value>
     ///   The default is <b>null</b> and the server will use its default of false.
     /// </value>
-    public bool? Create { get; set; } = null;
+    public bool? Create { get; set; }
 
     /// <summary>
     ///   Make parent directories as needed.
@@ -21,7 +21,7 @@ public class MfsWriteOptions
     /// <value>
     ///   The default is <b>null</b> and the server will use its default of false.
     /// </value>
-    public bool? Parents { get; set; } = null;
+    public bool? Parents { get; set; }
 
     /// <summary>
     ///   Byte offset to begin writing at.
@@ -30,7 +30,7 @@ public class MfsWriteOptions
     ///   The default is <b>null</b> and the argument will be omitted.
     ///   If ommitted the offset is zero.
     /// </value>
-    public long? Offset { get; set; } = null;
+    public long? Offset { get; set; }
 
     /// <summary>
     ///   Maximum number of bytes to write.
@@ -39,7 +39,7 @@ public class MfsWriteOptions
     ///   The default is <b>null</b> and the argument will be omitted.
     ///   If ommitted, all the data will be written.
     /// </value>
-    public long? Count { get; set; } = null;
+    public long? Count { get; set; }
 
     /// <summary>
     ///    Cid version to use.
@@ -48,7 +48,7 @@ public class MfsWriteOptions
     ///   The default is <b>null</b> and the server will use its default Cid Version.
     /// </value>
     /// <seealso cref="Cid.Version"/>
-    public int? CidVersion { get; set; } = null;
+    public int? CidVersion { get; set; }
 
     /// <summary>
     ///   Truncate the file to size zero before writing
@@ -56,7 +56,7 @@ public class MfsWriteOptions
     /// <value>
     ///   The default is <b>null</b> and the server will use its default of false.
     /// </value>
-    public bool? Truncate { get; set; } = null;
+    public bool? Truncate { get; set; }
 
     /// <summary>
     ///   Use raw blocks for newly created leaf nodes.
@@ -64,7 +64,7 @@ public class MfsWriteOptions
     /// <value>
     ///   The default is <b>null</b> and the server will use its default of false.
     /// </value>
-    public bool? RawLeaves { get; set; } = null;
+    public bool? RawLeaves { get; set; }
 
     /// <summary>
     ///   The hashing algorithm name to use.
@@ -74,7 +74,7 @@ public class MfsWriteOptions
     ///   The default is <b>null</b> and the server will use its default algorithm name.
     /// </value>
     /// <seealso cref="MultiHash.DefaultAlgorithmName"/>
-    public string? Hash { get; set; } = null;
+    public string? Hash { get; set; }
 
     /// <summary>
     ///   Flush the data to disk after writing.
@@ -85,5 +85,5 @@ public class MfsWriteOptions
     /// <remarks>
     ///   Use caution when setting this flag to false. It will improve performance for large numbers of file operations, but it does so at the cost of consistency guarantees. If the daemon is unexpectedly killed before running a proper flush, then data may be lost. This also applies to running the gc concurrently with flush false.
     /// </remarks>
-    public bool? Flush { get; set; } = null;
+    public bool? Flush { get; set; }
 }
