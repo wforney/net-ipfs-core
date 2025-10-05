@@ -170,7 +170,8 @@ public static class Varint
             bytes[i++] = v;
             value >>= 7;
         } while (value != 0);
-        await stream.WriteAsync(bytes, 0, i, cancel).ConfigureAwait(false);
+        await stream.WriteAsync(new ReadOnlyMemory<byte>(bytes, 0, i), cancel)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -230,7 +231,7 @@ public static class Varint
         byte[] buffer = new byte[1];
         while (true)
         {
-            if (1 != await stream.ReadAsync(buffer, 0, 1, cancel).ConfigureAwait(false))
+            if (1 != await stream.ReadAsync(new Memory<byte>(buffer, 0, 1), cancel).ConfigureAwait(false))
             {
                 if (bytesRead == 0)
                 {
