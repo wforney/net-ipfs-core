@@ -197,3 +197,5 @@ FakesAssemblies/
 
 # VS 2017 creates this
 src/Ipfs.Core.xml
+
+.fake
