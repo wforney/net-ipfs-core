@@ -135,7 +135,10 @@ Added missing IFileSystemApi.ListAsync. Doesn't fully replace the removed IFileS
           See CI failures: MultiHashTest/HashingTest around SHAKE-128 digest length.
         -->
         <PackageReference Include="Portable.BouncyCastle" Version="1.8.5" />
-        <PackageReference Include="SimpleBase" Version="2.1.0" />
+        <PackageReference Include="SimpleBase" Version="2.1.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+        <PackageReference Include="SimpleBase" Version="4.0.2" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
+        <PackageReference Include="SimpleBase" Version="5.5.0" Condition="'$(TargetFramework)' == 'net8.0'" />
+        <PackageReference Include="SimpleBase" Version="5.5.0" Condition="'$(TargetFramework)' == 'net9.0'" />
         <PackageReference Include="Grpc.Tools" Version="2.72.0" PrivateAssets="All" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
