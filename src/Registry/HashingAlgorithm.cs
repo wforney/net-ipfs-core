@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.Concurrent;
+using System.Security.Cryptography;
 using Ipfs.Cryptography;
 using BC = Org.BouncyCastle.Crypto.Digests;
 
@@ -35,8 +36,9 @@ namespace Ipfs.Registry;
 /// </remarks>
 public class HashingAlgorithm
 {
-    internal static Dictionary<string, HashingAlgorithm> Names = new(StringComparer.Ordinal);
-    internal static Dictionary<int, HashingAlgorithm> Codes = [];
+    internal static ConcurrentDictionary<string, HashingAlgorithm> Names = new(StringComparer.Ordinal);
+    internal static ConcurrentDictionary<int, HashingAlgorithm> Codes = new();
+    private static readonly object SyncRoot = new();
 
     /// <summary>
     ///   Register the standard hash algorithms for IPFS.
@@ -79,6 +81,8 @@ public class HashingAlgorithm
     ///   A unique name.
     /// </value>
     public string Name { get; private set; } = string.Empty;
+
+    private string RegistryName { get; set; } = string.Empty;
 
     /// <summary>
     ///   The IPFS number assigned to the hashing algorithm.
@@ -141,29 +145,41 @@ public class HashingAlgorithm
             throw new ArgumentNullException(nameof(name));
         }
 
-        if (Names.ContainsKey(name))
+        lock (SyncRoot)
         {
-            throw new ArgumentException($"The IPFS hashing algorithm '{name}' is already defined.");
+            if (Names.ContainsKey(name))
+            {
+                throw new ArgumentException($"The IPFS hashing algorithm '{name}' is already defined.");
+            }
+
+            if (Codes.ContainsKey(code))
+            {
+                throw new ArgumentException($"The IPFS hashing algorithm code 0x{code:x2} is already defined.");
+            }
+
+            hasher ??= () => throw new NotImplementedException($"The IPFS hashing algorithm '{name}' is not implemented.");
+
+            var a = new HashingAlgorithm
+            {
+                Name = name,
+                RegistryName = name,
+                Code = code,
+                DigestSize = digestSize,
+                Hasher = hasher
+            };
+            if (!Names.TryAdd(name, a))
+            {
+                throw new ArgumentException($"The IPFS hashing algorithm '{name}' is already defined.");
+            }
+
+            if (!Codes.TryAdd(code, a))
+            {
+                _ = Names.TryRemove(name, out _);
+                throw new ArgumentException($"The IPFS hashing algorithm code 0x{code:x2} is already defined.");
+            }
+
+            return a;
         }
-
-        if (Codes.ContainsKey(code))
-        {
-            throw new ArgumentException($"The IPFS hashing algorithm code 0x{code:x2} is already defined.");
-        }
-
-        hasher ??= () => throw new NotImplementedException($"The IPFS hashing algorithm '{name}' is not implemented.");
-
-        var a = new HashingAlgorithm
-        {
-            Name = name,
-            Code = code,
-            DigestSize = digestSize,
-            Hasher = hasher
-        };
-        Names[name] = a;
-        Codes[code] = a;
-
-        return a;
     }
 
     /// <summary>
@@ -185,31 +201,38 @@ public class HashingAlgorithm
             throw new ArgumentNullException(nameof(alias));
         }
 
-        if (Names.ContainsKey(alias))
+        lock (SyncRoot)
         {
-            throw new ArgumentException($"The IPFS hashing algorithm '{alias}' is already defined and cannot be used as an alias.");
+            if (Names.ContainsKey(alias))
+            {
+                throw new ArgumentException($"The IPFS hashing algorithm '{alias}' is already defined and cannot be used as an alias.");
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (!Names.TryGetValue(name, out HashingAlgorithm? existing))
+            {
+                throw new ArgumentException($"The IPFS hashing algorithm '{name}' is not defined.");
+            }
+
+            var a = new HashingAlgorithm
+            {
+                Name = existing.Name,
+                RegistryName = alias,
+                Code = existing.Code,
+                DigestSize = existing.DigestSize,
+                Hasher = existing.Hasher
+            };
+            if (!Names.TryAdd(alias, a))
+            {
+                throw new ArgumentException($"The IPFS hashing algorithm '{alias}' is already defined and cannot be used as an alias.");
+            }
+
+            return a;
         }
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        if (!Names.TryGetValue(name, out HashingAlgorithm? existing))
-        {
-            throw new ArgumentException($"The IPFS hashing algorithm '{name}' is not defined.");
-        }
-
-        var a = new HashingAlgorithm
-        {
-            Name = name,
-            Code = existing.Code,
-            DigestSize = existing.DigestSize,
-            Hasher = existing.Hasher
-        };
-        Names[alias] = a;
-
-        return a;
     }
 
     /// <summary>
@@ -220,8 +243,36 @@ public class HashingAlgorithm
     /// </param>
     public static void Deregister(HashingAlgorithm algorithm)
     {
-        _ = Names.Remove(algorithm.Name);
-        _ = Codes.Remove(algorithm.Code);
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(algorithm);
+#else
+        if (algorithm is null)
+        {
+            throw new ArgumentNullException(nameof(algorithm));
+        }
+#endif
+        lock (SyncRoot)
+        {
+            if (Names.TryGetValue(algorithm.RegistryName, out HashingAlgorithm? registered) && ReferenceEquals(algorithm, registered))
+            {
+                _ = Names.TryRemove(algorithm.RegistryName, out _);
+            }
+
+            if (string.Equals(algorithm.RegistryName, algorithm.Name, StringComparison.Ordinal)
+                && Codes.TryGetValue(algorithm.Code, out registered)
+                && ReferenceEquals(algorithm, registered))
+            {
+                foreach (KeyValuePair<string, HashingAlgorithm> entry in Names)
+                {
+                    if (entry.Value.Code == algorithm.Code)
+                    {
+                        _ = Names.TryRemove(entry.Key, out _);
+                    }
+                }
+
+                _ = Codes.TryRemove(algorithm.Code, out _);
+            }
+        }
     }
 
     /// <summary>
@@ -230,7 +281,7 @@ public class HashingAlgorithm
     /// <value>
     ///   The currently registered hashing algorithms.
     /// </value>
-    public static IEnumerable<HashingAlgorithm> All => Names.Values;
+    public static IEnumerable<HashingAlgorithm> All => Names.Values.ToArray();
 
     /// <summary>
     ///   Gets the <see cref="HashAlgorithm"/> with the specified IPFS multi-hash name.

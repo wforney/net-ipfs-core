@@ -45,6 +45,10 @@ public static class Base64Url
     /// <returns>
     ///   The string representation, in base 64, of the contents of <paramref name="bytes"/>.
     /// </returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Design",
+        "CA1055:URI-like return values should not be strings",
+        Justification = "Base64Url is an encoding, not a URI.")]
     public static string ToBase64Url(this byte[] bytes) => Encode(bytes);
 
     /// <summary>
@@ -59,10 +63,40 @@ public static class Base64Url
     /// </returns>
     public static byte[] Decode(string s)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(s);
+#else
         if (s is null)
         {
             throw new ArgumentNullException(nameof(s));
         }
+#endif
+
+#if NET8_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        int paddingIndex = s.IndexOf('=', StringComparison.Ordinal);
+#else
+        int paddingIndex = s.IndexOf('=');
+#endif
+        int paddingLength = paddingIndex < 0 ? 0 : s.Length - paddingIndex;
+        if (paddingLength > 2
+            || (paddingIndex >= 0 && (s.Length % 4 != 0 || paddingLength != 4 - (paddingIndex % 4))))
+        {
+            throw new FormatException("Illegal base64url string!");
+        }
+
+        for (int i = 0; i < s.Length; i++)
+        {
+            char c = s[i];
+            bool isBase64UrlCharacter = (c >= 'A' && c <= 'Z')
+                || (c >= 'a' && c <= 'z')
+                || (c >= '0' && c <= '9')
+                || c is '-' or '_';
+            if (!isBase64UrlCharacter && !(paddingIndex >= 0 && i >= paddingIndex && c == '='))
+            {
+                throw new FormatException("Illegal base64url string!");
+            }
+        }
+
         s = s.Replace('-', '+'); // 62nd char of encoding
         s = s.Replace('_', '/'); // 63rd char of encoding
 

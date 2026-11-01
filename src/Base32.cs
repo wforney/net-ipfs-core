@@ -37,11 +37,15 @@ public static class Base32
     /// </summary>
     /// <param name="input">An array of 8-bit unsigned integers.</param>
     /// <returns>The string representation, in base 32, of the contents of <paramref name="input"/>.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Globalization",
+        "CA1308:Normalize strings to uppercase",
+        Justification = "RFC 4648/IPFS Base32 uses lowercase canonical output.")]
     public static string Encode(byte[] input)
     {
         return input is null
             ? throw new ArgumentNullException(nameof(input))
-            : SimpleBase.Base32.Rfc4648.Encode(input, false).ToUpperInvariant();
+            : SimpleBase.Base32.Rfc4648.Encode(input, false).ToLowerInvariant();
     }
 
     /// <summary>

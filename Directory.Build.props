@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
-        <AnalysisLevel>preview-all</AnalysisLevel>
+        <AnalysisLevel>10.0</AnalysisLevel>
         <EnableNETAnalyzers>True</EnableNETAnalyzers>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <ImplicitUsings>enable</ImplicitUsings>

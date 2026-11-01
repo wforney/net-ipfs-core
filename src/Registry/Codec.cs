@@ -1,4 +1,7 @@
-﻿namespace Ipfs.Registry;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
+
+namespace Ipfs.Registry;
 
 /// <summary>
 ///   Metadata for IPFS multi-codec.
@@ -11,8 +14,9 @@
 /// <seealso href="https://github.com/multiformats/multicodec"/>
 public class Codec
 {
-    internal static Dictionary<string, Codec> Names = new(StringComparer.Ordinal);
-    internal static Dictionary<int, Codec> Codes = [];
+    internal static ConcurrentDictionary<string, Codec> Names = new(StringComparer.Ordinal);
+    internal static ConcurrentDictionary<int, Codec> Codes = new();
+    private static readonly object SyncRoot = new();
 
     /// <summary>
     ///   Register the standard multi-codecs for IPFS.
@@ -110,25 +114,36 @@ public class Codec
             throw new ArgumentNullException(nameof(name));
         }
 
-        if (Names.ContainsKey(name))
+        lock (SyncRoot)
         {
-            throw new ArgumentException(string.Format("The IPFS codec name '{0}' is already defined.", name));
+            if (Names.ContainsKey(name))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The IPFS codec name '{0}' is already defined.", name));
+            }
+
+            if (Codes.ContainsKey(code))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The IPFS codec code '{0}' is already defined.", code));
+            }
+
+            var a = new Codec
+            {
+                Name = name,
+                Code = code
+            };
+            if (!Names.TryAdd(name, a))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The IPFS codec name '{0}' is already defined.", name));
+            }
+
+            if (!Codes.TryAdd(code, a))
+            {
+                _ = Names.TryRemove(name, out _);
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The IPFS codec code '{0}' is already defined.", code));
+            }
+
+            return a;
         }
-
-        if (Codes.ContainsKey(code))
-        {
-            throw new ArgumentException(string.Format("The IPFS codec code '{0}' is already defined.", code));
-        }
-
-        var a = new Codec
-        {
-            Name = name,
-            Code = code
-        };
-        Names[name] = a;
-        Codes[code] = a;
-
-        return a;
     }
     /// <summary>
     ///   Remove an IPFS codec from the registry.
@@ -138,8 +153,26 @@ public class Codec
     /// </param>
     public static void Deregister(Codec codec)
     {
-        _ = Names.Remove(codec.Name);
-        _ = Codes.Remove(codec.Code);
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(codec);
+#else
+        if (codec is null)
+        {
+            throw new ArgumentNullException(nameof(codec));
+        }
+#endif
+        lock (SyncRoot)
+        {
+            if (Names.TryGetValue(codec.Name, out Codec? registered) && ReferenceEquals(codec, registered))
+            {
+                _ = Names.TryRemove(codec.Name, out _);
+            }
+
+            if (Codes.TryGetValue(codec.Code, out registered) && ReferenceEquals(codec, registered))
+            {
+                _ = Codes.TryRemove(codec.Code, out _);
+            }
+        }
     }
 
     /// <summary>
@@ -148,5 +181,5 @@ public class Codec
     /// <value>
     ///   All the registered codecs.
     /// </value>
-    public static IEnumerable<Codec> All => Names.Values;
+    public static IEnumerable<Codec> All => Names.Values.ToArray();
 }

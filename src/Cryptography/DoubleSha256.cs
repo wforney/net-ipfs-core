@@ -10,7 +10,11 @@ internal sealed class DoubleSha256 : HashAlgorithm, IDisposable
 
     public override int HashSize => _digest.HashSize;
 
-    public override void Initialize() => _digest.Initialize();
+    public override void Initialize()
+    {
+        _round1 = null;
+        _digest.Initialize();
+    }
 
     protected override void Dispose(bool disposing)
     {
@@ -34,7 +38,9 @@ internal sealed class DoubleSha256 : HashAlgorithm, IDisposable
 
     protected override byte[] HashFinal()
     {
+        byte[] firstDigest = _round1 ?? throw new InvalidOperationException("No data has been hashed.");
+        _round1 = null;
         _digest.Initialize();
-        return _digest.ComputeHash(_round1!);
+        return _digest.ComputeHash(firstDigest);
     }
 }

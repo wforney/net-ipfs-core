@@ -81,7 +81,11 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
     }
 
     public override bool CanReuseTransform => true;
+#if NET8_0_OR_GREATER
     public override byte[] Hash => HashValue!;
+#else
+    public override byte[] Hash => HashValue;
+#endif
     public int HashByteLength => HashSizeValue / 8;
     public override int HashSize => HashSizeValue;
     public int KeccakR { get; protected set; }
@@ -96,8 +100,9 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
 
     protected void AddToBuffer(byte[] array, ref int offset, ref int count)
     {
-        int amount = Math.Min(count, Buffer!.Length - BuffLength);
-        System.Buffer.BlockCopy(array, offset, Buffer, BuffLength, amount);
+        byte[] buffer = Buffer ?? throw new InvalidOperationException("The hash buffer has not been initialized.");
+        int amount = Math.Min(count, buffer.Length - BuffLength);
+        System.Buffer.BlockCopy(array, offset, buffer, BuffLength, amount);
         offset += amount;
         BuffLength += amount;
         count -= amount;
@@ -105,23 +110,35 @@ internal abstract class Keccak : System.Security.Cryptography.HashAlgorithm
 
     protected override void HashCore(byte[] array, int ibStart, int cbSize)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(array);
+        ArgumentOutOfRangeException.ThrowIfNegative(ibStart);
+        ArgumentOutOfRangeException.ThrowIfNegative(cbSize);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(cbSize, array.Length);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(ibStart, array.Length - cbSize);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+
         if (ibStart < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(ibStart));
         }
 
-        if (cbSize > array.Length)
+        if (cbSize < 0 || cbSize > array.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(cbSize));
         }
 
-        if (ibStart + cbSize > array.Length)
+        if (ibStart > array.Length - cbSize)
         {
             throw new ArgumentOutOfRangeException(nameof(ibStart), "ibStart or cbSize");
         }
+#endif
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
-    protected ulong ROL(ulong a, int offset) =>
-        (((a) << (offset % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - (offset % KeccakLaneSizeInBits))))!;
+    protected static ulong ROL(ulong a, int offset) =>
+        (((a) << (offset % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - (offset % KeccakLaneSizeInBits))));
 }

@@ -6,7 +6,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Ipfs.Serialization;
 
-internal static class JsonCompat
+/// <summary>
+/// Provides compatible JSON serialization for core IPFS value types.
+/// </summary>
+public static class JsonCompat
 {
     private static readonly JsonSerializerOptions DefaultStjOptions = ConfigureDefaultConverters(new JsonSerializerOptions
     {
@@ -16,6 +19,9 @@ internal static class JsonCompat
 
     private static readonly ConcurrentDictionary<System.Type, bool> RequiresNewtonsoft = new();
 
+    /// <summary>
+    /// Serializes a value using System.Text.Json when supported, otherwise Newtonsoft.Json.
+    /// </summary>
     public static string Serialize(object? value, JsonSerializerOptions? stjOptions = null, NewtonsoftJson.JsonSerializerSettings? newtonsoftSettings = null, bool forceNewtonsoft = false)
     {
         if (value is null)
@@ -31,6 +37,9 @@ internal static class JsonCompat
         return NewtonsoftJson.JsonConvert.SerializeObject(value, newtonsoftSettings);
     }
 
+    /// <summary>
+    /// Deserializes a value using System.Text.Json when supported, otherwise Newtonsoft.Json.
+    /// </summary>
     public static T? Deserialize<T>(string json, JsonSerializerOptions? stjOptions = null, NewtonsoftJson.JsonSerializerSettings? newtonsoftSettings = null, bool forceNewtonsoft = false)
     {
         System.Type t = typeof(T);
@@ -41,12 +50,19 @@ internal static class JsonCompat
         return NewtonsoftJson.JsonConvert.DeserializeObject<T>(json, newtonsoftSettings);
     }
 
+    /// <summary>
+    /// Deserializes a value of the specified type using the compatible serializer.
+    /// </summary>
     public static object? Deserialize(string json, System.Type type, JsonSerializerOptions? stjOptions = null, NewtonsoftJson.JsonSerializerSettings? newtonsoftSettings = null, bool forceNewtonsoft = false)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(type);
+#else
         if (type is null)
         {
             throw new System.ArgumentNullException(nameof(type));
         }
+#endif
         if (!forceNewtonsoft && CanUseSystemTextJson(type))
         {
             return System.Text.Json.JsonSerializer.Deserialize(json, type, stjOptions ?? DefaultStjOptions);
@@ -77,26 +93,30 @@ internal static class JsonCompat
         });
     }
 
+    /// <summary>
+    /// Adds the core value-type converters to the supplied System.Text.Json options.
+    /// </summary>
     public static JsonSerializerOptions ConfigureDefaultConverters(JsonSerializerOptions options)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(options);
+#else
         if (options is null)
         {
             throw new System.ArgumentNullException(nameof(options));
         }
+#endif
 
-        bool has = false;
-        foreach (JsonConverter converter in options.Converters)
-        {
-            if (converter is CidJsonConverter || converter is MultiHashJsonConverter || converter is MultiAddressJsonConverter)
-            {
-                has = true;
-                break;
-            }
-        }
-        if (!has)
+        if (!options.Converters.Any(static converter => converter is CidJsonConverter))
         {
             options.Converters.Add(new CidJsonConverter());
+        }
+        if (!options.Converters.Any(static converter => converter is MultiHashJsonConverter))
+        {
             options.Converters.Add(new MultiHashJsonConverter());
+        }
+        if (!options.Converters.Any(static converter => converter is MultiAddressJsonConverter))
+        {
             options.Converters.Add(new MultiAddressJsonConverter());
         }
         return options;
