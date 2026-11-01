@@ -215,7 +215,7 @@ public class MultiBaseTest
         foreach (MultiBaseAlgorithm alg in MultiBaseAlgorithm.All)
         {
             string bad = alg.Code + "?";
-            _ = ExceptionAssert.Throws<FormatException>(() => MultiBase.Decode(bad));
+            _ = Assert.ThrowsException<FormatException>(() => MultiBase.Decode(bad), $"Invalid value was accepted for '{alg.Name}'.");
         }
     }
 

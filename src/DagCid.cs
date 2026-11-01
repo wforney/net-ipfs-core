@@ -37,10 +37,14 @@ public record DagCid
         get;
         set
         {
+#if NET8_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(value);
+#else
             if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
+#endif
 
             if (value.ContentType == "libp2p-key")
             {
@@ -68,7 +72,16 @@ public record DagCid
     /// Thrown when attempting to cast a CID with ContentType "libp2p-key",
     /// as IPLD links must be immutable and libp2p-key CIDs represent mutable IPNS addresses.
     /// </exception>
-    public static explicit operator DagCid(Cid cid) => ToDagCid(cid);
+    public static explicit operator DagCid(Cid cid) =>
+        cid is null
+            ? null!
+            : cid.ContentType == "libp2p-key"
+                ? throw new ArgumentException(
+                "Cannot cast CID-encoded libp2p key to DagCid. " +
+                "IPLD links must be immutable, but libp2p-key CIDs represent mutable IPNS addresses. " +
+                "Use the resolved content CID instead.",
+                nameof(cid))
+                : ToDagCid(cid);
 
     /// <summary>
     /// Returns the string representation of the <see cref="DagCid"/>.

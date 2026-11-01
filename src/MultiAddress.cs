@@ -248,19 +248,7 @@ public class MultiAddress : IEquatable<MultiAddress>
             code += p.Code.GetHashCode();
             if (p.Value is string s)
             {
-#if NETSTANDARD2_1_OR_GREATER
-                code += s.GetHashCode(System.StringComparison.Ordinal);
-#else
-                code += s.GetHashCode();
-#endif
-            }
-            else
-            {
-#if NETSTANDARD2_1_OR_GREATER
-                code += p.Value?.GetHashCode(StringComparison.Ordinal) ?? 0;
-#else
-                code += p.Value?.GetHashCode() ?? 0;
-#endif
+                code += StringComparer.Ordinal.GetHashCode(s);
             }
         }
         return code;

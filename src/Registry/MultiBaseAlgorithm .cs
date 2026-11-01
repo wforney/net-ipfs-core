@@ -1,4 +1,6 @@
-﻿namespace Ipfs.Registry;
+﻿using System.Collections.Concurrent;
+
+namespace Ipfs.Registry;
 
 /// <summary>
 ///   Metadata and implementations of an IPFS multi-base algorithm.
@@ -15,13 +17,18 @@
 /// </remarks>
 public class MultiBaseAlgorithm
 {
-    internal static Dictionary<string, MultiBaseAlgorithm> Names = new(StringComparer.Ordinal);
-    internal static Dictionary<char, MultiBaseAlgorithm> Codes = [];
+    internal static ConcurrentDictionary<string, MultiBaseAlgorithm> Names = new(StringComparer.Ordinal);
+    internal static ConcurrentDictionary<char, MultiBaseAlgorithm> Codes = new();
+    private static readonly object SyncRoot = new();
 
     /// <summary>
     ///   Register the standard multi-base algorithms for IPFS.
     /// </summary>
     /// <seealso href="https://github.com/multiformats/multibase/blob/master/multibase.csv"/>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Globalization",
+        "CA1308:Normalize strings to uppercase",
+        Justification = "IPFS multibase names and canonical Base32 output require lowercase forms.")]
     static MultiBaseAlgorithm()
     {
         _ = Register("base58btc", 'z', static bytes => SimpleBase.Base58.Bitcoin.Encode(bytes), static s => ToByteArray(SimpleBase.Base58.Bitcoin.Decode(s)));
@@ -30,17 +37,17 @@ public class MultiBaseAlgorithm
         _ = Register("base64pad", 'M', static bytes => Convert.ToBase64String(bytes), static s => Convert.FromBase64String(s));
         _ = Register("base64url", 'u', static bytes => bytes.ToBase64Url(), static s => s.FromBase64Url());
         _ = Register("base16", 'f', static bytes => HexLower(bytes), static s => ToByteArray(SimpleBase.Base16.Decode(s)));
-        _ = Register("base32", 'b', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
-        _ = Register("base32pad", 'c', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
-        _ = Register("base32hex", 'v', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
-        _ = Register("base32hexpad", 't', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true).ToLowerInvariant(), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
+        _ = Register("base32", 'b', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false).ToLowerInvariant(), static s => DecodeBase32(s, false, false));
+        _ = Register("base32pad", 'c', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true).ToLowerInvariant(), static s => DecodeBase32(s, false, true));
+        _ = Register("base32hex", 'v', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false).ToLowerInvariant(), static s => DecodeBase32(s, true, false));
+        _ = Register("base32hexpad", 't', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true).ToLowerInvariant(), static s => DecodeBase32(s, true, true));
         _ = Register("base36", 'k', Base36.EncodeToStringLc, Base36.DecodeString);
         _ = Register("BASE16", 'F', static bytes => HexUpper(bytes), static s => ToByteArray(SimpleBase.Base16.Decode(s)));
-        _ = Register("BASE32", 'B', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
-        _ = Register("BASE32PAD", 'C', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true), static s => ToByteArray(SimpleBase.Base32.Rfc4648.Decode(s)));
-        _ = Register("BASE32HEX", 'V', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
-        _ = Register("BASE32HEXPAD", 'T', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true), static s => ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(s)));
-        _ = Register("base32z", 'h', static bytes => Base32z.Codec.Encode(bytes, false), static s => ToByteArray(Base32z.Codec.Decode(s)));
+        _ = Register("BASE32", 'B', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, false), static s => DecodeBase32(s, false, false));
+        _ = Register("BASE32PAD", 'C', static bytes => SimpleBase.Base32.Rfc4648.Encode(bytes, true), static s => DecodeBase32(s, false, true));
+        _ = Register("BASE32HEX", 'V', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, false), static s => DecodeBase32(s, true, false));
+        _ = Register("BASE32HEXPAD", 'T', static bytes => SimpleBase.Base32.ExtendedHex.Encode(bytes, true), static s => DecodeBase32(s, true, true));
+        _ = Register("base32z", 'h', static bytes => Base32z.Codec.Encode(bytes, false), DecodeBase32z);
     }
 
     /// <summary>
@@ -112,29 +119,41 @@ public class MultiBaseAlgorithm
             throw new ArgumentNullException(nameof(name));
         }
 
-        if (Names.ContainsKey(name))
+        lock (SyncRoot)
         {
-            throw new ArgumentException($"The IPFS multi-base algorithm name '{name}' is already defined.");
+            if (Names.ContainsKey(name))
+            {
+                throw new ArgumentException($"The IPFS multi-base algorithm name '{name}' is already defined.");
+            }
+
+            if (Codes.ContainsKey(code))
+            {
+                throw new ArgumentException($"The IPFS multi-base algorithm code '{code}' is already defined.");
+            }
+
+            encode ??= _ => throw new NotImplementedException($"The IPFS encode multi-base algorithm '{name}' is not implemented.");
+            decode ??= _ => throw new NotImplementedException($"The IPFS decode multi-base algorithm '{name}' is not implemented.");
+
+            var a = new MultiBaseAlgorithm
+            {
+                Name = name,
+                Code = code,
+                Encode = encode,
+                Decode = decode
+            };
+            if (!Names.TryAdd(name, a))
+            {
+                throw new ArgumentException($"The IPFS multi-base algorithm name '{name}' is already defined.");
+            }
+
+            if (!Codes.TryAdd(code, a))
+            {
+                _ = Names.TryRemove(name, out _);
+                throw new ArgumentException($"The IPFS multi-base algorithm code '{code}' is already defined.");
+            }
+
+            return a;
         }
-
-        if (Codes.ContainsKey(code))
-        {
-            throw new ArgumentException($"The IPFS multi-base algorithm code '{code}' is already defined.");
-        }
-
-        encode ??= _ => throw new NotImplementedException($"The IPFS encode multi-base algorithm '{name}' is not implemented.");
-        decode ??= _ => throw new NotImplementedException($"The IPFS decode multi-base algorithm '{name}' is not implemented.");
-
-        var a = new MultiBaseAlgorithm
-        {
-            Name = name,
-            Code = code,
-            Encode = encode,
-            Decode = decode
-        };
-        Names[name] = a;
-        Codes[code] = a;
-        return a;
     }
 
     /// <summary>
@@ -145,23 +164,124 @@ public class MultiBaseAlgorithm
     /// </param>
     public static void Deregister(MultiBaseAlgorithm algorithm)
     {
-        _ = Names.Remove(algorithm.Name);
-        _ = Codes.Remove(algorithm.Code);
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(algorithm);
+#else
+        if (algorithm is null)
+        {
+            throw new ArgumentNullException(nameof(algorithm));
+        }
+#endif
+        lock (SyncRoot)
+        {
+            if (Names.TryGetValue(algorithm.Name, out MultiBaseAlgorithm? registered) && ReferenceEquals(algorithm, registered))
+            {
+                _ = Names.TryRemove(algorithm.Name, out _);
+            }
+
+            if (Codes.TryGetValue(algorithm.Code, out registered) && ReferenceEquals(algorithm, registered))
+            {
+                _ = Codes.TryRemove(algorithm.Code, out _);
+            }
+        }
     }
 
     /// <summary>
     ///   A sequence consisting of all algorithms.
     /// </summary>
-    public static IEnumerable<MultiBaseAlgorithm> All => Names.Values;
+    public static IEnumerable<MultiBaseAlgorithm> All => Names.Values.ToArray();
 
     private static string HexLower(byte[] bytes) => Hex(bytes, false);
     private static string HexUpper(byte[] bytes) => Hex(bytes, true);
+
+    private static byte[] DecodeBase32(string value, bool extendedHex, bool padded)
+    {
+#if NET8_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        int paddingIndex = value.IndexOf('=', StringComparison.Ordinal);
+#else
+        int paddingIndex = value.IndexOf('=');
+#endif
+        if (paddingIndex >= 0)
+        {
+            int paddingLength = value.Length - paddingIndex;
+            int expectedPadding = GetBase32PaddingLength(paddingIndex);
+            if (!padded || value.Length % 8 != 0 || paddingLength != expectedPadding)
+            {
+                throw new FormatException("Invalid Base32 padding.");
+            }
+        }
+        else if (padded && value.Length % 8 != 0)
+        {
+            throw new FormatException("Invalid Base32 padding.");
+        }
+
+        bool paddingStarted = false;
+        foreach (char character in value)
+        {
+            if (character == '=')
+            {
+                paddingStarted = true;
+                continue;
+            }
+
+            bool valid = extendedHex
+                ? character is >= '0' and <= '9' or >= 'A' and <= 'V' or >= 'a' and <= 'v'
+                : character is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '2' and <= '7';
+            if (paddingStarted || !valid)
+            {
+                throw new FormatException($"Invalid Base32 character '{character}'.");
+            }
+        }
+
+        if (extendedHex)
+        {
+            return ToByteArray(SimpleBase.Base32.ExtendedHex.Decode(value));
+        }
+
+        return ToByteArray(SimpleBase.Base32.Rfc4648.Decode(value));
+    }
+
+    private static byte[] DecodeBase32z(string value)
+    {
+        const string Alphabet = "ybndrfg8ejkmcpqxot1uwisza345h769";
+        foreach (char character in value)
+        {
+#if NET8_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (Alphabet.IndexOf(character, StringComparison.Ordinal) < 0)
+#else
+            if (Alphabet.IndexOf(character) < 0)
+#endif
+            {
+                throw new FormatException($"Invalid Base32z character '{character}'.");
+            }
+        }
+
+        return ToByteArray(Base32z.Codec.Decode(value));
+    }
+
+    private static int GetBase32PaddingLength(int encodedLength)
+    {
+        return (encodedLength % 8) switch
+        {
+            0 => 0,
+            2 => 6,
+            4 => 4,
+            5 => 3,
+            7 => 1,
+            _ => -1
+        };
+    }
+
     private static string Hex(byte[] bytes, bool upper)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(bytes);
+#else
         if (bytes is null)
         {
             throw new ArgumentNullException(nameof(bytes));
         }
+#endif
         char[] c = new char[bytes.Length * 2];
         int i = 0;
         foreach (byte b in bytes)

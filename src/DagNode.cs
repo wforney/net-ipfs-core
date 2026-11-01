@@ -32,8 +32,11 @@ public sealed class DagNode : IMerkleNode<IMerkleLink>
     /// </param>
     public DagNode(ReadOnlyMemory<byte>? data, IEnumerable<IMerkleLink>? links = null, string hashAlgorithm = MultiHash.DefaultAlgorithmName)
     {
-        DataBytes = data ?? ReadOnlyMemory<byte>.Empty;
+        DataBytes = data is { } value
+            ? new ReadOnlyMemory<byte>(value.ToArray())
+            : ReadOnlyMemory<byte>.Empty;
         var orderedLinks = (links ?? Array.Empty<IMerkleLink>())
+            .Select(static link => new DagLink(link))
             .OrderBy(link => link.Name ?? "")
             .ToList()
             .AsReadOnly();
@@ -51,10 +54,14 @@ public sealed class DagNode : IMerkleNode<IMerkleLink>
     /// </param>
     public DagNode(Stream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
         Read(stream);
     }
 
@@ -68,10 +75,14 @@ public sealed class DagNode : IMerkleNode<IMerkleLink>
     /// </param>
     public DagNode(CodedInputStream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
         Read(stream);
     }
 
@@ -216,10 +227,14 @@ public sealed class DagNode : IMerkleNode<IMerkleLink>
     /// </param>
     public void Write(CodedOutputStream stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
         foreach (DagLink? link in ReadOnlyLinks.Select(l => new DagLink(l)))
         {
             using var linkStream = new MemoryStream();
@@ -255,11 +270,11 @@ public sealed class DagNode : IMerkleNode<IMerkleLink>
             switch (WireFormat.GetTagFieldNumber(tag))
             {
                 case 1:
-                    DataBytes = new ReadOnlyMemory<byte>(stream.ReadSomeBytes(stream.ReadLength())!);
+                    DataBytes = new ReadOnlyMemory<byte>(stream.ReadSomeBytes(stream.ReadLength()));
                     done = true;
                     break;
                 case 2:
-                    using (var ms = new MemoryStream(stream.ReadSomeBytes(stream.ReadLength())!))
+                    using (var ms = new MemoryStream(stream.ReadSomeBytes(stream.ReadLength())))
                     {
                         links.Add(new DagLink(ms));
                     }

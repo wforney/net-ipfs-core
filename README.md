@@ -14,7 +14,7 @@
 - 🔐 **MultiHash** - Cryptographic hash agility with 15+ algorithms (SHA-256, BLAKE2, SHA-3, etc.)  
 - 🌍 **MultiAddress** - Protocol-aware network addressing for peer discovery
 - 📊 **Merkle DAG** - Immutable, verifiable data structures for content integrity
-- 🎯 **Multi-targeting** - .NET Standard 2.0+, .NET 8.0+, .NET 9.0 support
+- 🎯 **Multi-targeting** - .NET Standard 2.0+, .NET 8.0+, .NET 9.0, and .NET 10.0 support
 - ⚡ **High Performance** - Zero-allocation paths and efficient serialization
 
 ## 🚀 Quick Start
@@ -144,10 +144,11 @@ var nodeCid = node.Id; // Content ID derived from node content
 Seamless dual JSON support with automatic fallback:
 
 ```csharp
-// Works with both Newtonsoft.Json and System.Text.Json
+// Works with Newtonsoft.Json; configure the core converters for System.Text.Json
 var cid = new Cid("QmHash...");
 var json = JsonConvert.SerializeObject(cid);              // Newtonsoft
-var systemJson = JsonSerializer.Serialize(cid);           // System.Text.Json
+var options = JsonCompat.ConfigureDefaultConverters(new JsonSerializerOptions());
+var systemJson = JsonSerializer.Serialize(cid, options);   // System.Text.Json
 
 // Custom JsonCompat utility handles compatibility automatically
 var result = JsonCompat.Serialize(cid, forceNewtonsoft: false);
@@ -226,4 +227,3 @@ Licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
 ---
 
 **Built with ❤️ by the IPFS Shipyard community** | [🌟 Star us on GitHub](https://github.com/ipfs-shipyard/net-ipfs-core)
-

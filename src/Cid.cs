@@ -80,6 +80,10 @@ public class Cid : IEquatable<Cid>
     /// <see cref="MultiHash.Digest"/> is also the content. This is commonly referred to as 'CID
     /// inlining'. </note>
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Design",
+        "CA1065:Do not raise exceptions in unexpected locations",
+        Justification = "A CID without a multihash is invalid; preserve the established InvalidDataException contract.")]
     public MultiHash Hash
     {
         get => field ?? throw new InvalidDataException("Hash has not been set");
@@ -373,7 +377,7 @@ public class Cid : IEquatable<Cid>
 #if NET8_0_OR_GREATER
     public override int GetHashCode() => Encode().GetHashCode(StringComparison.Ordinal);
 #else
-    public override int GetHashCode() => Encode().GetHashCode();
+    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Encode());
 #endif
 
     /// <summary>

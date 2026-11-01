@@ -24,6 +24,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// The cached base-58 encoding of the multihash.
     /// </summary>
     private string? _b58String;
+    private readonly byte[] _digest;
 
     /// <summary>
     /// Creates a new instance of the <see cref="MultiHash"/> class with the specified <see
@@ -33,6 +34,15 @@ public class MultiHash : IEquatable<MultiHash>
     /// <param name="digest">The digest value as a byte array.</param>
     public MultiHash(string algorithmName, byte[] digest)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(digest);
+#else
+        if (digest is null)
+        {
+            throw new ArgumentNullException(nameof(digest));
+        }
+#endif
+
         if (!HashingAlgorithm.Names.TryGetValue(algorithmName, out HashingAlgorithm? a))
         {
             throw new ArgumentException($"The IPFS hashing algorithm '{algorithmName}' is unknown.");
@@ -40,12 +50,12 @@ public class MultiHash : IEquatable<MultiHash>
 
         Algorithm = a;
 
-        if (Algorithm.DigestSize != 0 && Algorithm.DigestSize != digest?.Length)
+        if (Algorithm.DigestSize != 0 && Algorithm.DigestSize != digest.Length)
         {
-            throw new ArgumentException($"The digest size for '{algorithmName}' is {Algorithm.DigestSize} bytes, not {digest?.Length}.");
+            throw new ArgumentException($"The digest size for '{algorithmName}' is {Algorithm.DigestSize} bytes, not {digest.Length}.");
         }
 
-        Digest = digest;
+        _digest = digest.ToArray();
     }
 
     /// <summary>
@@ -71,7 +81,7 @@ public class MultiHash : IEquatable<MultiHash>
     public MultiHash(byte[] buffer)
     {
         using var ms = new MemoryStream(buffer, false);
-        (Algorithm, Digest) = Read(ms);
+        (Algorithm, _digest) = Read(ms);
     }
 
     /// <summary>
@@ -95,7 +105,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// cref="MultiHash"/> even when the hashing algorithm is unknown.
     /// </para>
     /// </remarks>
-    public MultiHash(Stream stream) => (Algorithm, Digest) = Read(stream);
+    public MultiHash(Stream stream) => (Algorithm, _digest) = Read(stream);
 
     /// <summary>
     /// Creates a new instance of the <see cref="MultiHash"/> class from the specified <see cref="CodedInputStream"/>.
@@ -129,7 +139,7 @@ public class MultiHash : IEquatable<MultiHash>
         }
 #endif
 
-        (Algorithm, Digest) = Read(stream);
+        (Algorithm, _digest) = Read(stream);
     }
 
     /// <summary>
@@ -150,7 +160,7 @@ public class MultiHash : IEquatable<MultiHash>
     public MultiHash(string s)
     {
         using var ms = new MemoryStream(s.FromBase58(), false);
-        (Algorithm, Digest) = Read(ms);
+        (Algorithm, _digest) = Read(ms);
     }
 
     /// <summary>
@@ -169,7 +179,7 @@ public class MultiHash : IEquatable<MultiHash>
     /// </summary>
     /// <value>The output of the hashing algorithm.</value>
     [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Public API")]
-    public byte[] Digest { get; }
+    public byte[] Digest => _digest.ToArray();
 
     /// <summary>
     /// Determines if the identity hash algorithm is in use.
@@ -269,10 +279,10 @@ public class MultiHash : IEquatable<MultiHash>
     public override bool Equals(object? obj) => (obj is MultiHash that) && Equals(that);
 
     /// <inheritdoc/>
-    public bool Equals(MultiHash? that) => Algorithm.Code == that?.Algorithm.Code && Digest.SequenceEqual(that.Digest);
+    public bool Equals(MultiHash? that) => Algorithm.Code == that?.Algorithm.Code && _digest.SequenceEqual(that._digest);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => ToString().GetHashCode();
+    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(ToString());
 
     /// <summary>
     /// Determines if the data matches the hash.
@@ -283,9 +293,14 @@ public class MultiHash : IEquatable<MultiHash>
     public bool Matches(byte[] data)
     {
         byte[] digest = Algorithm.Hasher().ComputeHash(data);
+        if (digest.Length != _digest.Length)
+        {
+            return false;
+        }
+
         for (int i = digest.Length - 1; 0 <= i; --i)
         {
-            if (digest[i] != Digest[i])
+            if (digest[i] != _digest[i])
             {
                 return false;
             }
@@ -303,9 +318,14 @@ public class MultiHash : IEquatable<MultiHash>
     public bool Matches(Stream data)
     {
         byte[] digest = Algorithm.Hasher().ComputeHash(data);
+        if (digest.Length != _digest.Length)
+        {
+            return false;
+        }
+
         for (int i = digest.Length - 1; 0 <= i; --i)
         {
-            if (digest[i] != Digest[i])
+            if (digest[i] != _digest[i])
             {
                 return false;
             }
@@ -435,7 +455,7 @@ public class MultiHash : IEquatable<MultiHash>
             throw new InvalidDataException($"The digest size {digestSize} is wrong for {a.Name}; it should be {a.DigestSize}.");
         }
 
-        byte[] digest = stream.ReadSomeBytes(digestSize)!;
+        byte[] digest = stream.ReadSomeBytes(digestSize);
         return (a, digest);
     }
 
@@ -443,7 +463,8 @@ public class MultiHash : IEquatable<MultiHash>
     /// Conversion of a <see cref="MultiHash"/> to and from JSON.
     /// </summary>
     /// <remarks>The JSON is just a single string value.</remarks>
-    private class Json : JsonConverter
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated through the JsonConverter attribute.")]
+    private sealed class Json : JsonConverter
     {
         public override bool CanRead => true;
 

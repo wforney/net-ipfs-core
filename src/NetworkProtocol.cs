@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using Google.Protobuf;
@@ -15,8 +16,9 @@ namespace Ipfs;
 /// <seealso cref="MultiAddress"/>
 public abstract class NetworkProtocol
 {
-    internal static Dictionary<string, Type> Names = new(StringComparer.Ordinal);
-    internal static Dictionary<uint, Type> Codes = [];
+    internal static ConcurrentDictionary<string, Type> Names = new(StringComparer.Ordinal);
+    internal static ConcurrentDictionary<uint, Type> Codes = new();
+    private static readonly object SyncRoot = new();
 
     /// <summary>
     ///   Registers the standard network protocols for IPFS.
@@ -64,18 +66,29 @@ public abstract class NetworkProtocol
     {
         var protocol = new T();
 
-        if (Names.ContainsKey(protocol.Name))
+        lock (SyncRoot)
         {
-            throw new ArgumentException($"The IPFS network protocol '{protocol.Name}' is already defined.");
-        }
+            if (Names.ContainsKey(protocol.Name))
+            {
+                throw new ArgumentException($"The IPFS network protocol '{protocol.Name}' is already defined.");
+            }
 
-        if (Codes.ContainsKey(protocol.Code))
-        {
-            throw new ArgumentException($"The IPFS network protocol code ({protocol.Code}) is already defined.");
-        }
+            if (Codes.ContainsKey(protocol.Code))
+            {
+                throw new ArgumentException($"The IPFS network protocol code ({protocol.Code}) is already defined.");
+            }
 
-        Names.Add(protocol.Name, typeof(T));
-        Codes.Add(protocol.Code, typeof(T));
+            if (!Names.TryAdd(protocol.Name, typeof(T)))
+            {
+                throw new ArgumentException($"The IPFS network protocol '{protocol.Name}' is already defined.");
+            }
+
+            if (!Codes.TryAdd(protocol.Code, typeof(T)))
+            {
+                _ = Names.TryRemove(protocol.Name, out _);
+                throw new ArgumentException($"The IPFS network protocol code ({protocol.Code}) is already defined.");
+            }
+        }
     }
 
     /// <summary>
@@ -88,17 +101,23 @@ public abstract class NetworkProtocol
     {
         var protocol = new T();
 
-        if (Names.ContainsKey(protocol.Name))
+        lock (SyncRoot)
         {
-            throw new ArgumentException($"The IPFS network protocol '{protocol.Name}' is already defined.");
-        }
+            if (Names.ContainsKey(protocol.Name))
+            {
+                throw new ArgumentException($"The IPFS network protocol '{protocol.Name}' is already defined.");
+            }
 
-        if (!Codes.ContainsKey(protocol.Code))
-        {
-            throw new ArgumentException($"The IPFS network protocol code ({protocol.Code}) is not defined.");
-        }
+            if (!Codes.ContainsKey(protocol.Code))
+            {
+                throw new ArgumentException($"The IPFS network protocol code ({protocol.Code}) is not defined.");
+            }
 
-        Names.Add(protocol.Name, typeof(T));
+            if (!Names.TryAdd(protocol.Name, typeof(T)))
+            {
+                throw new ArgumentException($"The IPFS network protocol '{protocol.Name}' is already defined.");
+            }
+        }
     }
 
     /// <summary>
@@ -141,10 +160,14 @@ public abstract class NetworkProtocol
     /// </remarks>
     public virtual void WriteValue(TextWriter stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         if (Value is not null)
         {
@@ -176,10 +199,14 @@ public abstract class NetworkProtocol
     /// </remarks>
     public virtual void ReadValue(TextReader stream)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(stream);
+#else
         if (stream is null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
+#endif
 
         Value = string.Empty;
         int c;
@@ -213,7 +240,7 @@ internal class TcpNetworkProtocol : NetworkProtocol
         base.ReadValue(stream);
         try
         {
-            Port = ushort.Parse(Value!, CultureInfo.InvariantCulture);
+            Port = ushort.Parse(Value ?? string.Empty, CultureInfo.InvariantCulture);
         }
         catch (Exception e)
         {
@@ -222,7 +249,7 @@ internal class TcpNetworkProtocol : NetworkProtocol
     }
     public override void ReadValue(CodedInputStream stream)
     {
-        byte[] bytes = stream.ReadSomeBytes(2)!;
+        byte[] bytes = stream.ReadSomeBytes(2);
         Port = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(bytes, 0));
         Value = Port.ToString(CultureInfo.InvariantCulture);
     }
@@ -302,7 +329,7 @@ internal sealed class Ipv4NetworkProtocol : IpNetworkProtocol
     }
     public override void ReadValue(CodedInputStream stream)
     {
-        byte[] a = stream.ReadSomeBytes(AddressSize)!;
+        byte[] a = stream.ReadSomeBytes(AddressSize);
         Address = new IPAddress(a);
         Value = Address.ToString();
     }
@@ -325,7 +352,7 @@ internal sealed class Ipv6NetworkProtocol : IpNetworkProtocol
     }
     public override void ReadValue(CodedInputStream stream)
     {
-        byte[] a = stream.ReadSomeBytes(AddressSize)!;
+        byte[] a = stream.ReadSomeBytes(AddressSize);
         Address = new IPAddress(a);
         Value = Address.ToString();
     }
@@ -402,10 +429,10 @@ internal sealed class OnionNetworkProtocol : NetworkProtocol
 
     public override void ReadValue(CodedInputStream stream)
     {
-        Address = stream.ReadSomeBytes(10)!;
-        byte[] bytes = stream.ReadSomeBytes(2)!;
+        Address = stream.ReadSomeBytes(10);
+        byte[] bytes = stream.ReadSomeBytes(2);
         Port = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(bytes, 0));
-        Value = string.Format(CultureInfo.InvariantCulture, "{0}:{1}", Address.ToBase32().ToUpperInvariant(), Port);
+        Value = string.Format(CultureInfo.InvariantCulture, "{0}:{1}", Address.ToBase32(), Port);
     }
     public override void WriteValue(CodedOutputStream stream)
     {
@@ -584,7 +611,7 @@ internal sealed class IpcidrNetworkProtocol : NetworkProtocol
         base.ReadValue(stream);
         try
         {
-            RoutingPrefix = ushort.Parse(Value!, CultureInfo.InvariantCulture);
+            RoutingPrefix = ushort.Parse(Value ?? string.Empty, CultureInfo.InvariantCulture);
         }
         catch (Exception e)
         {
@@ -593,7 +620,7 @@ internal sealed class IpcidrNetworkProtocol : NetworkProtocol
     }
     public override void ReadValue(CodedInputStream stream)
     {
-        byte[] bytes = stream.ReadSomeBytes(2)!;
+        byte[] bytes = stream.ReadSomeBytes(2);
         RoutingPrefix = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(bytes, 0));
         Value = RoutingPrefix.ToString(CultureInfo.InvariantCulture);
     }

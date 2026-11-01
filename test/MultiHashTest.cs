@@ -107,6 +107,22 @@ public class MultiHashTest
     }
 
     /// <summary>
+    /// Verifies that callers cannot mutate the stored digest.
+    /// </summary>
+    [TestMethod]
+    public void Digest_IsDefensivelyCopied()
+    {
+        byte[] source = [0x01, 0x02];
+        var hash = new MultiHash("identity", source);
+        source[0] = 0xff;
+
+        byte[] exposed = hash.Digest;
+        exposed[1] = 0xff;
+
+        CollectionAssert.AreEqual(new byte[] { 0x01, 0x02 }, hash.Digest);
+    }
+
+    /// <summary>
     /// Computes a hash from a byte array.
     /// </summary>
     [TestMethod]

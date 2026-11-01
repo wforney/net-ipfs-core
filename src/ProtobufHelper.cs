@@ -18,5 +18,7 @@ internal static class ProtobufHelper
 
     public static void WriteSomeBytes(this CodedOutputStream stream, byte[] bytes) => _ = WriteRawBytes.Invoke(stream, [bytes]);
 
-    public static byte[]? ReadSomeBytes(this CodedInputStream stream, int length) => (byte[]?)ReadRawBytes.Invoke(stream, [length]);
+    public static byte[] ReadSomeBytes(this CodedInputStream stream, int length) =>
+        ReadRawBytes.Invoke(stream, [length]) as byte[]
+        ?? throw new InvalidDataException("The protobuf stream returned no byte array.");
 }

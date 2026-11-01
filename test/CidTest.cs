@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Google.Protobuf;
+using Ipfs.Serialization;
 using Newtonsoft.Json;
 
 namespace Ipfs;
@@ -512,6 +513,23 @@ public class CidTest
         Assert.IsNotNull(y);
         Assert.AreEqual(x.Cid, y!.Cid);
         Assert.AreEqual(x.X, y.X);
+    }
+
+    /// <summary>
+    /// Verifies that System.Text.Json uses the CID string representation.
+    /// </summary>
+    [TestMethod]
+    public void SystemTextJsonSerialization()
+    {
+        Cid cid = "QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V";
+        var options = JsonCompat.ConfigureDefaultConverters(new System.Text.Json.JsonSerializerOptions());
+
+        string json = System.Text.Json.JsonSerializer.Serialize(cid, options);
+        Cid? deserialized = System.Text.Json.JsonSerializer.Deserialize<Cid>(json, options);
+
+        Assert.AreEqual($"\"{cid}\"", json);
+        Assert.AreEqual(cid, deserialized);
+        Assert.AreEqual(cid, JsonCompat.Deserialize<Cid>(JsonCompat.Serialize(cid)));
     }
 
     /// <summary>

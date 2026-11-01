@@ -16,7 +16,7 @@ public class DagLink : IMerkleLink
     public DagLink(string? name, Cid id, ulong size)
     {
         Name = name;
-        Id = id;
+        Id = CopyCid(id);
         Size = size;
     }
 
@@ -39,7 +39,7 @@ public class DagLink : IMerkleLink
 #endif
 
         Name = link.Name;
-        Id = link.Id;
+        Id = CopyCid(link.Id);
         Size = link.Size;
     }
 
@@ -62,7 +62,10 @@ public class DagLink : IMerkleLink
         }
 #endif
 
-        (Name, Id, Size) = Read(stream);
+        (string? name, Cid id, ulong size) = Read(stream);
+        Name = name;
+        Id = CopyCid(id);
+        Size = size;
     }
 
     /// <summary>
@@ -84,7 +87,10 @@ public class DagLink : IMerkleLink
         }
 #endif
 
-        (Name, Id, Size) = Read(stream);
+        (string? name, Cid id, ulong size) = Read(stream);
+        Name = name;
+        Id = CopyCid(id);
+        Size = size;
     }
 
     /// <inheritdoc />
@@ -95,6 +101,27 @@ public class DagLink : IMerkleLink
 
     /// <inheritdoc />
     public ulong Size { get; private set; }
+
+    private static Cid CopyCid(Cid id)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(id);
+#else
+        if (id is null)
+        {
+            throw new ArgumentNullException(nameof(id));
+        }
+#endif
+        var copy = new Cid
+        {
+            Version = id.Version,
+            Encoding = id.Encoding,
+            ContentType = id.ContentType,
+            Hash = new MultiHash(id.Hash.Algorithm.Name, id.Hash.Digest)
+        };
+        _ = copy.Encode();
+        return copy;
+    }
 
     /// <summary>
     ///   Writes the binary representation of the link to the specified <see cref="Stream"/>.

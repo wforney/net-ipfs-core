@@ -22,6 +22,21 @@ public class HashingAlgorithmTest
     }
 
     /// <summary>
+    /// Verifies that the double-SHA256 implementation can be reused.
+    /// </summary>
+    [TestMethod]
+    public void DoubleSha256Hasher_CanBeReused()
+    {
+        using System.Security.Cryptography.HashAlgorithm hasher = HashingAlgorithm.GetAlgorithm("dbl-sha2-256");
+        byte[] input = [0xe9];
+        byte[] expected = System.Security.Cryptography.SHA256.HashData(
+            System.Security.Cryptography.SHA256.HashData(input));
+
+        CollectionAssert.AreEqual(expected, hasher.ComputeHash(input));
+        CollectionAssert.AreEqual(expected, hasher.ComputeHash(input));
+    }
+
+    /// <summary>
     /// Gets a hasher by alias.
     /// </summary>
     [TestMethod]
@@ -118,4 +133,42 @@ public class HashingAlgorithmTest
     /// </summary>
     [TestMethod]
     public void HashingAlgorithms_Are_Enumerable() => Assert.IsLessThanOrEqualTo(HashingAlgorithm.All.Count(), 5);
+
+    /// <summary>
+    /// Verifies that removing an alias leaves the canonical algorithm registered.
+    /// </summary>
+    [TestMethod]
+    public void DeregisteringAlias_PreservesCanonicalAlgorithm()
+    {
+        string aliasName = "test-alias-" + Guid.NewGuid().ToString("N");
+        HashingAlgorithm alias = HashingAlgorithm.RegisterAlias(aliasName, "sha3-256");
+
+        HashingAlgorithm.Deregister(alias);
+
+        Assert.AreEqual("sha3-256", HashingAlgorithm.GetAlgorithmMetadata("sha3-256").Name);
+        _ = ExceptionAssert.Throws<KeyNotFoundException>(() => HashingAlgorithm.GetAlgorithmMetadata(aliasName));
+    }
+
+    /// <summary>
+    /// Verifies that concurrent registrations can be looked up safely.
+    /// </summary>
+    [TestMethod]
+    public void ConcurrentRegistrationAndLookup()
+    {
+        const int count = 32;
+        string prefix = "test-concurrent-" + Guid.NewGuid().ToString("N");
+        HashingAlgorithm[] algorithms = new HashingAlgorithm[count];
+
+        Parallel.For(0, count, i =>
+        {
+            algorithms[i] = HashingAlgorithm.Register($"{prefix}-{i}", 0x70000000 + i, 32, System.Security.Cryptography.SHA256.Create);
+        });
+
+        Parallel.For(0, count, i =>
+        {
+            Assert.AreEqual($"{prefix}-{i}", HashingAlgorithm.GetAlgorithmMetadata($"{prefix}-{i}").Name);
+        });
+
+        Parallel.ForEach(algorithms, HashingAlgorithm.Deregister);
+    }
 }

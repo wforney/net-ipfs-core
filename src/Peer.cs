@@ -90,7 +90,7 @@ public class Peer : IEquatable<Peer>
     public bool Equals(Peer? that) => Id == that?.Id;
 
     /// <inheritdoc/>
-    public override int GetHashCode() => ToString().GetHashCode();
+    public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(ToString());
 
     /// <summary>
     /// Determines if the information on the peer is valid.

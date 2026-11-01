@@ -47,6 +47,26 @@ public class DagNodeTest
     }
 
     /// <summary>
+    /// Verifies that constructor inputs cannot mutate the node after construction.
+    /// </summary>
+    [TestMethod]
+    public void Constructor_DefensivelyCopiesDataAndLinks()
+    {
+        byte[] data = [0x01, 0x02];
+        Cid linkCid = "QmXg9Pp2ytZ14xgmQjYEiHjVjMFXzCVVEcRTWJBmLgR39V";
+        var link = new DagLink("link", linkCid, 1);
+        var node = new DagNode(data, [link]);
+        Cid originalId = node.Id;
+
+        data[0] = 0xff;
+        linkCid.ContentType = "raw";
+
+        CollectionAssert.AreEqual(new byte[] { 0x01, 0x02 }, node.DataBytes.ToArray());
+        Assert.AreEqual(originalId, node.Id);
+        Assert.AreEqual(0, node.ReadOnlyLinks.Single().Id.Version);
+    }
+
+    /// <summary>
     /// An empty DAG node.
     /// </summary>ReadOnly
     [TestMethod]

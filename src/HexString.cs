@@ -42,10 +42,14 @@ public static class HexString
     /// </returns>
     public static string Encode(byte[] buffer, string format = "G")
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(buffer);
+#else
         if (buffer is null)
         {
             throw new ArgumentNullException(nameof(buffer));
         }
+#endif
 
         string[] hexStrings = format switch
         {
@@ -89,10 +93,14 @@ public static class HexString
     /// </returns>
     public static byte[] Decode(string s)
     {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(s);
+#else
         if (s is null)
         {
             throw new ArgumentNullException(nameof(s));
         }
+#endif
 
         int n = s.Length;
         if (n % 2 != 0)
